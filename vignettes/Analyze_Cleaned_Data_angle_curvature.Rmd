@@ -1529,6 +1529,11 @@ ggplot(data = data_cut_clean_Water_example,
 
 # DRAFT CURVATURE -------------------------------------------
 
+Now we can compute the divergence in trajectory between the water tracers and the food tracers. 
+- we calculate the angle made by the trajectory of each particle in the medio-lateral angle.
+- we calculate the curvature made by the trajectory of each particle in the medio-lateral angle.
+
+
 ### Divergence calculation
 ```{r}
 Divergence <- list()
@@ -1606,7 +1611,7 @@ Divergence_df <- Divergence_df %>% mutate(item = case_when(str_detect(string = p
    
 ```
 
-### Food vs water path angle Visualisation
+### Food vs water path angle and curvature Visualisation
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
 
@@ -1674,10 +1679,6 @@ Angle_interval_food <- Divergence_df_food %>%
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                              str_detect(string = particle, pattern = "A") ~ "F"))
 
- # # organized by trial 
- #  Angle_interval_trial <- map(.x = Trials, .f = ~(filter(.data = Angle_interval, str_detect(string = particle, pattern = names(Maya_WF[.]))))) %>% set_names(names(Maya_WF[Trials]))
-
-
 ```
 
 ##### Curvature
@@ -1714,10 +1715,6 @@ Curvature_interval_food <- Divergence_df_food %>%
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                              str_detect(string = particle, pattern = "A") ~ "F"))
 
- # # organized by trial 
- #  Angle_interval_trial <- map(.x = Trials, .f = ~(filter(.data = Angle_interval, str_detect(string = particle, pattern = names(Maya_WF[.]))))) %>% set_names(names(Maya_WF[Trials]))
-
-
 ```
 
 #### Visualisation
@@ -1741,7 +1738,7 @@ Now that we have the angle for intervals of tx for the water and the food items,
   
   
   ggplot(Angle_interval_species[[species]], aes(x=interval, y=angle, fill=item)) +
-    geom_boxplot(notch=FALSE
+    geom_boxplot(notch=TRUE
                  , outlier.shape = NA
                  # , outlier.shape=8,  outlier.size=4
     ) +
@@ -1794,7 +1791,7 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
   
   
   ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
-    geom_boxplot(notch=FALSE
+    geom_boxplot(notch=TRUE
                  , outlier.shape = NA
                  #, outlier.shape=8,  outlier.size=4
     ) +
@@ -1831,6 +1828,7 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
 #### Statistical test
 
 We perform a t.test on each interval.
+
 ##### Angle
 ```{r}
 # Carps
@@ -1904,11 +1902,6 @@ t_test_p_value_Tilapias <-map(.x = Intervals,
                            .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
 
 ```
-
-# END DRAFT CURVATURE ----------------------------------------------------------------
-
-
-
 
 # Rigid body kinematics
 

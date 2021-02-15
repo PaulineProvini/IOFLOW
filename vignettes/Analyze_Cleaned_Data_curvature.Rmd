@@ -1129,13 +1129,13 @@ During each phase, the anterio posterior component is the most important one. Th
 
 
 
-## Angle path 
+## Divergence 
 
 We hypothesize that the waterflow, exiting through the opercula during each backflow, causes a passive sorting based on the different mass of the ingested particles. The inertia effect would lead the biggest particles (food item) to stay on the same path, following a midsagittal trajectory towards the esophagus. The cycles reverse flow / back flow put the tracers in suspension in the buccal cavity and increase the probability to be sensed with appropriate sensory organs and trapped (actively) by the pharyngeal jaws if they correspond to a food item. 
 
 We explored this hypothesis by detecting the shift in the waterflow trajectory in comparison to the food tracer trajectory.  
   -> Calculating the angle formed by the position of a given particle during three consecutive frame  
-  -> Calculating the curvature 
+  -> Calculating the curvature formed by the position of a given particle during three consecutive frame  
 
 
 ### Data preparation
@@ -1306,240 +1306,25 @@ ggplot(data = data_cut_clean_Water_example,
 
 ```
 
-<!-- ### Path Angle calculation -->
-<!-- Now we can calculate the angle made by the trajectory of each particle. We calculate the angle in a the dorsoventral view. -->
 
+Now we can compute the divergence in trajectory between the water tracers and the food tracers. 
+We calculate the curvature made by the trajectory of each particle in the medio-lateral angle.
 
-<!-- ```{r} -->
-<!-- Angle <- list() -->
-<!-- span <- 1 # for each frame -->
-
-<!-- for(trial in Trials){ -->
-<!--   Particles <- levels(factor(FS_Trial_clean[[trial]]$Grp))  -->
-
-<!--   for (i in 1:length(Particles)){ -->
-<!--     Temp_particle <- FS_Trial_clean[[trial]][which( -->
-<!--     FS_Trial_clean[[trial]]$Grp == Particles[i]),] -->
-
-<!--     for (j in (1+span):(nrow(Temp_particle)-(span))){ -->
-<!--       A <- unlist(Temp_particle[(j-span),1:3]) -->
-<!--       B <- unlist(Temp_particle[j,1:3]) -->
-<!--       C <- unlist(Temp_particle[(j+span),1:3])  -->
-
-<!--       A[2] <- 0 # we delete the y coordinate to calculate the angle in the dorsoventral view -->
-<!--       B[2] <- 0 -->
-<!--       C[2] <- 0 -->
-
-<!--       name <- str_replace(string = Particles[i], pattern =  "_data.tx", replacement = "" ) -->
-
-<!--       Angle[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(angle3D(A,B,C)) -->
-<!--       Angle[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- unlist(Temp_particle $ WF_tx_pcent[j]) -->
-<!--       Angle[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- unlist(Temp_particle[j,1]) -->
-<!--       Angle[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- unlist(Temp_particle[j,2]) -->
-<!--       Angle[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- unlist(Temp_particle[j,3]) -->
-<!--     } -->
-<!--   } -->
-<!-- } -->
-
-
-
-<!-- ``` -->
-
-<!-- We need to transform the Angle list into a data.frame with the particle name, angle, tx, tx_pcent, and tz.   -->
-
-
-<!-- ```{r} -->
-
-<!-- Angle_df_list <- unlist(unlist(Angle, recursive = FALSE), recursive = FALSE) -->
-
-<!-- # we divide between angle, tx, tx_pcent, and tz (same length): -->
-<!-- Angle_df_angle <- map(.x = str_which(string = names(Angle_df_list), pattern = "angle"), .f = ~get_sublist(lst = Angle_df_list, group_name = names(Angle_df_list)[[.]])) -->
-
-<!-- Angle_df_tx_pcent <- map(.x = str_which(string = names(Angle_df_list), pattern = "_tx_pcent"), .f = ~get_sublist(lst = Angle_df_list, group_name = names(Angle_df_list)[[.]])) -->
-
-<!-- Angle_df_tz <- map(.x = str_which(string = names(Angle_df_list), pattern = "_tz"), .f = ~get_sublist(lst = Angle_df_list, group_name = names(Angle_df_list)[[.]])) -->
-
-
-<!-- Angle_df <- data.frame(particle = str_sub(string = melt(Angle_df_angle)[,2],  -->
-<!--                          start = 21,  -->
-<!--                          end = (nchar(melt(Angle_df_angle)[,2])-6)), -->
-<!--       angle = melt(Angle_df_angle)[,1],  -->
-<!--       tx_pcent= melt(Angle_df_tx_pcent)[,1],  -->
-<!--       tz= melt(Angle_df_tz)[,1] ) -->
-
-<!-- # we add a column with the item category: -->
-<!-- Angle_df <- Angle_df %>% mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W",  -->
-<!--                              str_detect(string = particle, pattern = "A") ~ "F")) -->
-
-<!-- ``` -->
-
-<!-- ### Food vs water path angle Visualisation -->
-
-<!-- ```{r , fig.width=5, fig.show='hold',fig.align='center'} -->
-
-<!-- color <- c(palette_IOFLOW[13], # grey -->
-<!--            palette_IOFLOW[5]   # blue -->
-<!-- )  -->
-
-<!-- Angle_df %>% filter(item == "W") %>% filter(tx_pcent > 2 & tx_pcent < 82) %>%  -->
-<!-- ggplot(aes(y=-angle, x=tx_pcent)) + -->
-<!--  geom_path(aes(group=particle, color= item), size = 0.8) + -->
-<!--  geom_path(data = Angle_df %>% filter(item == "F") %>% filter(tx_pcent > 2 & tx_pcent < 82), aes(group=particle, color= item), size = 0.8) + -->
-<!--     ylab("tz (cm)") + -->
-<!--     xlab("tx (cm)")+ -->
-<!--     scale_color_manual(values = color)+ -->
-<!--       theme_minimal()  -->
-
-<!-- ``` -->
-
-<!-- ### Average of food and water tracer angle on a small span of tx -->
-
-<!-- #### Data preparation -->
-<!-- ```{r} -->
-
-<!-- # split between water and food particles -->
-<!-- Angle_df_water <-  Angle_df %>% filter(item == "W") %>% filter(tx_pcent > 2 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) -->
-<!-- Angle_df_food <-  Angle_df %>% filter(item == "F") %>% filter(tx_pcent > 2 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE)) -->
-
-<!-- # we cut by the number of intervals we want (5 intervals) -->
-
-<!-- breaks <- seq(from = 0, to = 100, by = 20) -->
-
-<!-- # water ----------------- -->
-<!-- Angle_interval_water <- Angle_df_water %>%  -->
-<!--     mutate(interval = cut(tx_pcent, -->
-<!--                           breaks,  -->
-<!--                           include.lowest = TRUE,  -->
-<!--                           right = FALSE)) %>% group_by(interval) -->
-<!-- Angle_interval_water_mean <-  Angle_interval_water %>%   summarise( mean.angle = mean(angle, na.rm=TRUE), sd.angle = sd(angle, na.rm=TRUE) ) -->
-
-<!--  # food ----------------- -->
-<!-- Angle_interval_food <- Angle_df_food %>%  -->
-<!--     mutate(interval = cut(tx_pcent, -->
-<!--                           breaks,  -->
-<!--                           include.lowest = TRUE,  -->
-<!--                           right = FALSE)) %>% group_by(interval)  -->
-
-<!--  Angle_interval_food_mean <- Angle_interval_food %>% summarise( mean.angle = mean(angle, na.rm=TRUE) , sd.angle = sd(angle, na.rm=TRUE) ) -->
-
-<!-- # merge water and food particles -->
-<!--  Angle_interval<-  rbind(Angle_interval_water, Angle_interval_food) %>% arrange(desc(interval)) %>%  -->
-<!--  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W",  -->
-<!--                              str_detect(string = particle, pattern = "A") ~ "F")) -->
-
-<!--  # # organized by trial  -->
-<!--  #  Angle_interval_trial <- map(.x = Trials, .f = ~(filter(.data = Angle_interval, str_detect(string = particle, pattern = names(Maya_WF[.]))))) %>% set_names(names(Maya_WF[Trials])) -->
-
-
-<!-- ``` -->
-
-<!-- #### Visualisation -->
-<!-- Now that we have the angle for intervals of tx for the water and the food items, we organize the data by Species and visualize the difference between each item (Figure 4 in the manuscript). -->
-
-<!-- ```{r , fig.width=5, fig.show='hold',fig.align='center'} -->
-<!--  # Either Carp of Tilapia:   -->
-<!--     Species <- c("C", "T") -->
-
-<!--  Angle_interval_species <- map(.x = Species, .f = ~(filter(.data = Angle_interval, str_detect(string =  str_sub(string = particle, start = 4, end = 7 ), pattern = .)))) %>% set_names(Species) -->
-
-<!--    # plot the Carp data: -->
-<!--   species <- "C" -->
-
-<!--   color <- c(palette_IOFLOW[13], # grey -->
-<!--              palette_IOFLOW[5]   # blue -->
-<!--   ) -->
-
-
-
-<!--   ggplot(Angle_interval_species[[species]], aes(x=interval, y=angle, fill=item)) + -->
-<!--     geom_boxplot(notch=FALSE -->
-<!--                  , outlier.shape = NA -->
-<!--                  # , outlier.shape=8,  outlier.size=4 -->
-<!--     ) + -->
-<!--     labs(x="percentage of tx", y = "angle (degrees)") +  -->
-<!--     scale_color_manual(values = color)+ -->
-<!--     scale_fill_manual(values =  color)+ labs(subtitle = species )+ -->
-<!--     theme_minimal() + -->
-<!--     stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) + -->
-<!--     theme(legend.position = "none") +  -->
-<!--     ylim(173,182.5)  -->
-
-
-<!--   # plot the Tilapia data: -->
-<!--   species <- "T" -->
-
-<!--   ggplot(Angle_interval_species[[species]], aes(x=interval, y=angle, fill=item)) + -->
-
-<!--     geom_boxplot(notch=TRUE -->
-<!--                  , outlier.shape = NA -->
-<!--                  # , outlier.shape=8,  outlier.size=4 -->
-<!--     ) + -->
-<!--     labs(x="percentage of tx", y = "angle (degrees)") +  -->
-<!--     scale_color_manual(values = color)+ -->
-<!--     scale_fill_manual(values =  color)+ labs(subtitle = species )+ -->
-<!--     theme_minimal() + -->
-<!--     stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) + -->
-<!--     theme(legend.position = "none") +  -->
-<!--     ylim(173,182.5)  -->
-
-
-
-<!-- ``` -->
-
-<!-- #### Statistical test -->
-
-<!-- We perform a t.test on each interval. -->
-
-<!-- ```{r} -->
-<!-- # Carps -->
-<!-- species <- "C" -->
-<!-- Intervals <-levels(Angle_interval_species[[species]]$interval) -->
-<!-- Intervals <- Intervals[1:4] -->
-<!-- t_test_results_Carps <- map(.x = Intervals,  -->
-<!--                             .f = ~(t.test(angle ~ item, -->
-<!--                                           data = filter(.data = Angle_interval_species[[species]], interval== .), -->
-<!--                                           alternative = "two.sided", -->
-<!--                                           mu = 0, -->
-<!--                                           paired = FALSE, -->
-<!--                                           var.equal = TRUE, -->
-<!--                                           conf.level = 0.95))) %>% set_names(Intervals) -->
-
-
-<!-- t_test_p_value_Carps <-map(.x = Intervals,  -->
-<!--                            .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals) -->
-
-
-<!-- # Tilapias  -->
-<!-- species <- "T" -->
-<!-- t_test_results_Tilapias <- map(.x = Intervals,  -->
-<!--                             .f = ~(t.test(angle ~ item, -->
-<!--                                           data = filter(.data = Angle_interval_species[[species]], interval== .), -->
-<!--                                           alternative = "two.sided", -->
-<!--                                           mu = 0, -->
-<!--                                           paired = FALSE, -->
-<!--                                           var.equal = TRUE, -->
-<!--                                           conf.level = 0.95))) %>% set_names(Intervals) -->
-
-
-<!-- t_test_p_value_Tilapias <-map(.x = Intervals,  -->
-<!--                            .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals) -->
-
-<!-- ``` -->
-
-
-# DRAFT CURVATURE -------------------------------------------
 
 ### Divergence calculation
+#### Mediolateral motions
+
 ```{r}
 Divergence <- list()
 span <- 1 # for each frame
 
-for(trial in Trials){
+for(trial in Trials){ # c(1:10,12:13)
   Particles <- levels(factor(FS_Trial_clean[[trial]]$Grp)) 
   
   for (i in 1:length(Particles)){
     Temp_particle <- FS_Trial_clean[[trial]][which(
-    FS_Trial_clean[[trial]]$Grp == Particles[i]),]
+    FS_Trial_clean[[trial]]$Grp == Particles[i]),] %>%
+      filter(WF_tx_pcent < 100) 
     
     if (nrow(Temp_particle) <= 1) {
       Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- NA
@@ -1556,14 +1341,14 @@ for(trial in Trials){
       B <- unlist(Temp_particle[j,1:3])
       C <- unlist(Temp_particle[(j+span),1:3]) 
 
-      # A[2] <- 0 # we delete the y coordinate to calculate the angle in the dorsoventral view
-      # B[2] <- 0
-      # C[2] <- 0
+      A[2] <- 0 # we delete the y coordinate to calculate the divergence data in the dorsoventral view (medio-lateral)
+      B[2] <- 0
+      C[2] <- 0
       
       name <- str_replace(string = Particles[i], pattern =  "_data.tx", replacement = "" )
     
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(angle3D_curv(A,B,C)[1])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- as.vector(angle3D_curv(A,B,C)[2])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(compute_divergence(A,B,C)[1])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- as.vector(compute_divergence(A,B,C)[2])
       Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- unlist(Temp_particle $ WF_tx_pcent[j])
       Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- unlist(Temp_particle[j,1])
       Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- unlist(Temp_particle[j,2])
@@ -1573,6 +1358,13 @@ for(trial in Trials){
   }
 }
 
+Divergence_clean <- Divergence
+
+Divergence_clean[["T2P1T10"]] <- NULL
+
+
+
+
 ```
 
 We need to transform the Divergence list into a data.frame with the particle name, angle, curvature, tx, tx_pcent, and tz.  
@@ -1580,7 +1372,285 @@ We need to transform the Divergence list into a data.frame with the particle nam
 
 ```{r}
 
-Divergence_df_list <- unlist(unlist(Divergence, recursive = FALSE), recursive = FALSE)
+Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE), recursive = FALSE)
+
+# we divide between angle, tx, tx_pcent, and tz (same length):
+Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list), pattern = "angle"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+Divergence_df_curvature <- map(.x = str_which(string = names(Divergence_df_list), pattern = "curvature"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+Divergence_df_tx_pcent <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tx_pcent"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+
+Divergence_df_tx <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tx"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+Divergence_df_ty <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_ty"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+Divergence_df_tz <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tz"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+
+
+Divergence_df <- data.frame(particle = str_sub(string = melt(Divergence_df_angle)[,2], 
+                         start = 21, 
+                         end = (nchar(melt(Divergence_df_angle)[,2])-6)),
+      angle = melt(Divergence_df_angle)[,1],
+      curvature = melt(Divergence_df_curvature)[,1],
+      tx_pcent= melt(Divergence_df_tx_pcent)[,1], 
+      tx= melt(Divergence_df_tx)[,1], 
+      ty= melt(Divergence_df_ty)[,1],
+      tz= melt(Divergence_df_tz)[,1] )
+
+# we add a column with the item category:
+Divergence_df <- Divergence_df %>% mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                             str_detect(string = particle, pattern = "A") ~ "F"))
+   
+# plot the trajectories
+
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% filter(str_detect(string = particle, pattern = "C")) %>% 
+ggplot(aes(y=tz, x=tx_pcent)) +
+ geom_line(aes(group=particle, color= item), size = 0.8) +
+ geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
+    ylab("tz") +
+    xlab("tx (cm)")+
+    scale_color_manual(values = color)+ labs(subtitle = "Carps")
+      theme_minimal() 
+
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% filter(str_detect(string = particle, pattern = "C", negate = TRUE)) %>% 
+ggplot(aes(y=tz, x=tx_pcent)) +
+ geom_line(aes(group=particle, color= item), size = 0.8) +
+ geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
+    ylab("tz") +
+    xlab("tx (cm)")+
+    scale_color_manual(values = color)+ labs(subtitle = "Tilapias")
+      theme_minimal() 
+
+      
+      
+```
+
+### Food vs water path angle and curvature Visualisation
+
+```{r , fig.width=5, fig.show='hold',fig.align='center'}
+
+color <- c(palette_IOFLOW[13], # grey
+           palette_IOFLOW[5]   # blue
+) 
+
+# plot of the Angle data 
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% 
+ggplot(aes(y=-angle, x=tx_pcent)) +
+ geom_line(aes(group=particle, color= item), size = 0.8) +
+ geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
+    ylab("angle (deg)") +
+    xlab("tx (cm)")+
+    scale_color_manual(values = color)+ labs(subtitle = "Angle")
+
+
+# plot of the curvature data
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 95) %>% 
+ggplot(aes(y=curvature, x=tx_pcent)) +
+ geom_line(aes(group=particle, color= item), size = 0.8) +
+ geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 100), aes(group=particle, color= item), size = 0.8) +
+    ylab("curvature (m-1)") +
+    xlab("tx (cm)")+
+  scale_color_manual(values = color)+ labs(subtitle = "Cuvature")
+
+      
+
+```
+                               
+### Average of food and water tracer angle on a small span of tx
+
+#### Data preparation
+
+```{r}
+
+# split between water and food particles
+Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+
+# we cut by the number of intervals we want (5 intervals)
+ 
+breaks <- seq(from = 0, to = 75, by = 15)
+
+# water -----------------
+Curvature_interval_water <- Divergence_df_water %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval)
+Curvature_interval_water_mean <-  Curvature_interval_water %>%   summarise( mean.curvature = mean(curvature, na.rm=TRUE), sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ # food -----------------
+Curvature_interval_food <- Divergence_df_food %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval) 
+
+ Curvature_interval_food_mean <- Curvature_interval_food %>% summarise( mean.curvature = mean(curvature, na.rm=TRUE) , sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ 
+# merge water and food particles
+ Curvature_interval<-  rbind(Curvature_interval_water, Curvature_interval_food) %>% arrange(desc(interval)) %>% 
+ mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                             str_detect(string = particle, pattern = "A") ~ "F"))
+
+```
+
+#### Visualisation
+Now that we have the angle for intervals of tx for the water and the food items, we organize the data by Species and visualize the difference between each item (Figure 4 in the manuscript).
+
+
+##### Curvature
+
+```{r , fig.width=5, fig.show='hold',fig.align='center'}
+ # Either Carp of Tilapia:  
+    Species <- c("C", "T")
+    
+Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_interval, str_detect(string =  str_sub(string = particle, start = 4, end = 7 ), pattern = .)))) %>% set_names(Species)
+ 
+   # plot the Carp data:
+  species <- "C"
+  
+  color <- c(palette_IOFLOW[13], # grey
+             palette_IOFLOW[5]   # blue
+  )
+  
+  
+  
+  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
+    geom_boxplot(notch=TRUE
+                 , outlier.shape = NA
+                 #, outlier.shape=8,  outlier.size=4
+    ) +
+    labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
+    scale_color_manual(values = color)+
+    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    theme_minimal() +
+    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
+    theme(legend.position = "none") + 
+    ylim(-0.5,2) 
+
+    
+  # plot the Tilapia data:
+  species <- "T"
+  
+  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
+    
+    geom_boxplot(notch=TRUE
+                 , outlier.shape = NA
+                 # , outlier.shape=8,  outlier.size=4
+    ) +
+    labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
+    scale_color_manual(values = color)+
+    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    theme_minimal() +
+    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
+    theme(legend.position = "none")+   ylim(-0.5,2) 
+  
+  
+
+```
+
+
+#### Statistical test
+
+We perform a t.test on each interval.
+
+```{r}
+# Carps
+species <- "C"
+Intervals <- levels(Curvature_interval_species[[species]]$interval)
+t_test_results_Carps <- map(.x = Intervals, 
+                            .f = ~(t.test(curvature ~ item,
+                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          alternative = "two.sided",
+                                          mu = 0,
+                                          paired = FALSE,
+                                          var.equal = TRUE,
+                                          conf.level = 0.95))) %>% set_names(Intervals)
+
+t_test_p_value_Carps <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals)
+
+
+# Tilapias 
+species <- "T"
+t_test_results_Tilapias <- map(.x = Intervals, 
+                            .f = ~(t.test(curvature ~ item,
+                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          alternative = "two.sided",
+                                          mu = 0,
+                                          paired = FALSE,
+                                          var.equal = TRUE,
+                                          conf.level = 0.95))) %>% set_names(Intervals)
+
+
+t_test_p_value_Tilapias <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
+
+```
+
+#### Dorsoventral motions
+
+
+```{r}
+Divergence <- list()
+span <- 1 # for each frame
+
+for(trial in Trials){
+  Particles <- levels(factor(FS_Trial_clean[[trial]]$Grp)) 
+  
+  for (i in 1:length(Particles)){
+    Temp_particle <- FS_Trial_clean[[trial]][which(
+    FS_Trial_clean[[trial]]$Grp == Particles[i]),] %>%
+      filter(WF_tx_pcent < 100) 
+    
+    if (nrow(Temp_particle) <= 1) {
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- NA
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- NA
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- NA
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- NA
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- NA
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- NA
+      
+  }
+  else{
+        for (j in (1+span):(nrow(Temp_particle)-(span))){
+      A <- unlist(Temp_particle[(j-span),1:3])
+      B <- unlist(Temp_particle[j,1:3])
+      C <- unlist(Temp_particle[(j+span),1:3]) 
+
+      A[3] <- 0 # we delete the y coordinate to calculate the divergence data in the dorsoventral view (medio-lateral)
+      B[3] <- 0
+      C[3] <- 0
+      
+      name <- str_replace(string = Particles[i], pattern =  "_data.tx", replacement = "" )
+    
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(compute_divergence(A,B,C)[1])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- as.vector(compute_divergence(A,B,C)[2])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- unlist(Temp_particle $ WF_tx_pcent[j])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- unlist(Temp_particle[j,1])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- unlist(Temp_particle[j,2])
+      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- unlist(Temp_particle[j,3]) 
+        }
+  }
+  }
+}
+
+
+Divergence_clean <- Divergence
+
+Divergence_clean[["T2P1T10"]] <- NULL
+
+```
+
+We need to transform the Divergence list into a data.frame with the particle name, angle, curvature, tx, tx_pcent, and tz.  
+
+
+```{r}
+
+Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE), recursive = FALSE)
 
 # we divide between angle, tx, tx_pcent, and tz (same length):
 Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list), pattern = "angle"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
@@ -1606,7 +1676,7 @@ Divergence_df <- Divergence_df %>% mutate(item = case_when(str_detect(string = p
    
 ```
 
-### Food vs water path angle Visualisation
+### Food vs water path angle and curvature Visualisation
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
 
@@ -1615,20 +1685,20 @@ color <- c(palette_IOFLOW[13], # grey
 ) 
 
 # plot of the Angle data 
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 100) %>% 
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75) %>% 
 ggplot(aes(y=-angle, x=tx_pcent)) +
  geom_path(aes(group=particle, color= item), size = 0.8) +
- geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 100), aes(group=particle, color= item), size = 0.8) +
+ geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75), aes(group=particle, color= item), size = 0.8) +
     ylab("angle (deg)") +
     xlab("tx (cm)")+
     scale_color_manual(values = color)+ labs(subtitle = "Angle")
       theme_minimal() 
 
 # plot of the curvature data
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 74) %>% 
+Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75) %>% 
 ggplot(aes(y=curvature, x=tx_pcent)) +
  geom_path(aes(group=particle, color= item), size = 0.8) +
- geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 74), aes(group=particle, color= item), size = 0.8) +
+ geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75), aes(group=particle, color= item), size = 0.8) +
     ylab("tz (cm)") +
     xlab("tx (cm)")+
   scale_color_manual(values = color)+ labs(subtitle = "Cuvature")
@@ -1640,56 +1710,16 @@ ggplot(aes(y=curvature, x=tx_pcent)) +
 ### Average of food and water tracer angle on a small span of tx
 
 #### Data preparation
-##### Angle
+
 ```{r}
 
 # split between water and food particles
-Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 85)%>% arrange(desc(tx_pcent))
-Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 85)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
 
 # we cut by the number of intervals we want (5 intervals)
  
-breaks <- seq(from = 0, to = 100, by = 20)
-
-# water -----------------
-Angle_interval_water <- Divergence_df_water %>% 
-    mutate(interval = cut(tx_pcent,
-                          breaks, 
-                          include.lowest = TRUE, 
-                          right = FALSE)) %>% group_by(interval)
-Angle_interval_water_mean <-  Angle_interval_water %>%   summarise( mean.angle = mean(angle, na.rm=TRUE), sd.angle = sd(angle, na.rm=TRUE) )
-
- # food -----------------
-Angle_interval_food <- Divergence_df_food %>% 
-    mutate(interval = cut(tx_pcent,
-                          breaks, 
-                          include.lowest = TRUE, 
-                          right = FALSE)) %>% group_by(interval) 
-
- Angle_interval_food_mean <- Angle_interval_food %>% summarise( mean.angle = mean(angle, na.rm=TRUE) , sd.angle = sd(angle, na.rm=TRUE) )
-
- 
-# merge water and food particles
- Angle_interval<-  rbind(Angle_interval_water, Angle_interval_food) %>% arrange(desc(interval)) %>% 
- mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
-                             str_detect(string = particle, pattern = "A") ~ "F"))
-
- # # organized by trial 
- #  Angle_interval_trial <- map(.x = Trials, .f = ~(filter(.data = Angle_interval, str_detect(string = particle, pattern = names(Maya_WF[.]))))) %>% set_names(names(Maya_WF[Trials]))
-
-
-```
-
-##### Curvature
-```{r}
-
-# split between water and food particles
-Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 85)%>% arrange(desc(tx_pcent))
-Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 85)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
-
-# we cut by the number of intervals we want (5 intervals)
- 
-breaks <- seq(from = 0, to = 100, by = 20)
+breaks <- seq(from = 0, to = 75, by = 15)
 
 # water -----------------
 Curvature_interval_water <- Divergence_df_water %>% 
@@ -1714,66 +1744,10 @@ Curvature_interval_food <- Divergence_df_food %>%
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                              str_detect(string = particle, pattern = "A") ~ "F"))
 
- # # organized by trial 
- #  Angle_interval_trial <- map(.x = Trials, .f = ~(filter(.data = Angle_interval, str_detect(string = particle, pattern = names(Maya_WF[.]))))) %>% set_names(names(Maya_WF[Trials]))
-
-
 ```
 
 #### Visualisation
 Now that we have the angle for intervals of tx for the water and the food items, we organize the data by Species and visualize the difference between each item (Figure 4 in the manuscript).
-
-##### Angle
-
-```{r , fig.width=5, fig.show='hold',fig.align='center'}
- # Either Carp of Tilapia:  
-    Species <- c("C", "T")
-    
- Angle_interval_species <- map(.x = Species, .f = ~(filter(.data = Angle_interval, str_detect(string =  str_sub(string = particle, start = 4, end = 7 ), pattern = .)))) %>% set_names(Species)
- 
-   # plot the Carp data:
-  species <- "C"
-  
-  color <- c(palette_IOFLOW[13], # grey
-             palette_IOFLOW[5]   # blue
-  )
-  
-  
-  
-  ggplot(Angle_interval_species[[species]], aes(x=interval, y=angle, fill=item)) +
-    geom_boxplot(notch=FALSE
-                 , outlier.shape = NA
-                 # , outlier.shape=8,  outlier.size=4
-    ) +
-    labs(x="percentage of tx", y = "angle (degrees)") + 
-    scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
-    theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
-    theme(legend.position = "none") + 
-    ylim(173,182.5) 
-  
-    
-  # plot the Tilapia data:
-  species <- "T"
-  
-  ggplot(Angle_interval_species[[species]], aes(x=interval, y=angle, fill=item)) +
-    
-    geom_boxplot(notch=TRUE
-                 , outlier.shape = NA
-                 # , outlier.shape=8,  outlier.size=4
-    ) +
-    labs(x="percentage of tx", y = "angle (degrees)") + 
-    scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
-    theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
-    theme(legend.position = "none") + 
-    ylim(173,182.5) 
-  
-  
-
-```
 
 
 ##### Curvature
@@ -1794,7 +1768,7 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
   
   
   ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
-    geom_boxplot(notch=FALSE
+    geom_boxplot(notch=TRUE
                  , outlier.shape = NA
                  #, outlier.shape=8,  outlier.size=4
     ) +
@@ -1804,7 +1778,7 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
     theme_minimal() +
     stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
     theme(legend.position = "none") + 
-    ylim(-50,50) 
+    ylim(-0.5,5) 
 
     
   # plot the Tilapia data:
@@ -1821,7 +1795,7 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
     scale_fill_manual(values =  color)+ labs(subtitle = species )+
     theme_minimal() +
     stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
-    theme(legend.position = "none")+   ylim(-30,30) 
+    theme(legend.position = "none")+   ylim(-0.5,5) 
   
   
 
@@ -1831,51 +1805,13 @@ Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_
 #### Statistical test
 
 We perform a t.test on each interval.
-##### Angle
-```{r}
-# Carps
-species <- "C"
-Intervals <-levels(Angle_interval_species[[species]]$interval)
-Intervals <- Intervals[1:4]
-t_test_results_Carps <- map(.x = Intervals, 
-                            .f = ~(t.test(angle ~ item,
-                                          data = filter(.data = Angle_interval_species[[species]], interval== .),
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
 
-
-t_test_p_value_Carps <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals)
-
-
-# Tilapias 
-species <- "T"
-t_test_results_Tilapias <- map(.x = Intervals, 
-                            .f = ~(t.test(angle ~ item,
-                                          data = filter(.data = Angle_interval_species[[species]], interval== .),
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
-
-
-t_test_p_value_Tilapias <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
-
-```
-
-##### Curvature
 ```{r}
 # Carps
 species <- "C"
 Intervals <-levels(Curvature_interval_species[[species]]$interval)
-Intervals <- Intervals[1:4]
 t_test_results_Carps <- map(.x = Intervals, 
-                            .f = ~(t.test(angle ~ item,
+                            .f = ~(t.test(curvature ~ item,
                                           data = filter(.data = Curvature_interval_species[[species]], interval== .),
                                           alternative = "two.sided",
                                           mu = 0,
@@ -1884,14 +1820,14 @@ t_test_results_Carps <- map(.x = Intervals,
                                           conf.level = 0.95))) %>% set_names(Intervals)
 
 
-t_test_p_value_Carps <-map(.x = Intervals, 
+t_test_p_value_Carps_dv <-map(.x = Intervals, 
                            .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals)
 
 
 # Tilapias 
 species <- "T"
 t_test_results_Tilapias <- map(.x = Intervals, 
-                            .f = ~(t.test(angle ~ item,
+                            .f = ~(t.test(curvature ~ item,
                                           data = filter(.data = Curvature_interval_species[[species]], interval== .),
                                           alternative = "two.sided",
                                           mu = 0,
@@ -1900,13 +1836,10 @@ t_test_results_Tilapias <- map(.x = Intervals,
                                           conf.level = 0.95))) %>% set_names(Intervals)
 
 
-t_test_p_value_Tilapias <-map(.x = Intervals, 
+t_test_p_value_Tilapias_dv <-map(.x = Intervals, 
                            .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
 
 ```
-
-# END DRAFT CURVATURE ----------------------------------------------------------------
-
 
 
 
