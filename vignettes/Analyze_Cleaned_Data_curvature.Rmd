@@ -2,7 +2,7 @@
 title: "Analyse Cleaned Data"
 output: rmarkdown::html_vignette
 description: >
-  Start here to understand how the IOFLOW package functions to process the data.
+  Start here to understand how the IOFLOW package works to process the data.
 vignette: >
   %\VignetteIndexEntry{Analyze_Cleaned_Data}
   %\VignetteEncoding{UTF-8}
@@ -12,7 +12,10 @@ editor_options:
 ---
 
 
-This document shows how the different functions of the IOFLOW package are working together and how to generate the figures and tables associated with the manuscript. The cleaned data were generated using process.R as explained in the "Clean_Raw_Data" vignette.
+This document shows how the different functions of the IOFLOW package are 
+working together and how to generate the figures and tables associated with the 
+manuscript. The cleaned data were generated using process.R as explained in the 
+"Clean_Raw_Data" vignette.
 
 
 ```{r, include = FALSE}
@@ -58,7 +61,8 @@ There are three main datasets coming from the **IOFLOW package**:
  - Water and Food tracers data, refered to with "*WF*" suffix or prefix.  
  - Rigid body data, refered to with "*RB*" suffix or prefix.    
 
-The following script is based on functions we can call for a given trial or for all of them. For the analysis, there are: 
+The following script is based on functions we can call for a given trial or for 
+all of them. For the waterflow analysis, there are: 
 
  - 7 sequences of Carps   
  - 6 sequences of Tilapia  
@@ -68,16 +72,26 @@ The following script is based on functions we can call for a given trial or for 
 The water tracer had to fulfil two apparently contradictory requirements: 
 1) being radio-opaque to be trackable on the x-ray videos  
 2) being neutrally buoyant to passively follow the water trajectory. 
-We used 0.40 mm-diameter nickel rod on which we thread 1.4 mm closed-cell foam spheres (expanded polystyrene). We cut the nickel rod on both sides of each foam spheres to obtain the water tracers. The lightness of the foam counterbalanced the weight of the inserted nickel. 
+We used 0.40 mm-diameter nickel rod on which we thread 1.4 mm closed-cell foam 
+spheres (expanded polystyrene). We cut the nickel rod on both sides of each foam
+spheres to obtain the water tracers. The lightness of the foam counterbalanced 
+the weight of the inserted nickel. 
 
 ## Test of water tracer density
-We dropped 19 water tracers in the middle of a water column, filmed and extracted their trajectory, using ProAnalyst software (XCitex, Cambridge, MA, USA).  
-We calculated the mean velocity of the tracer until stabilization and calculated the water tracer density. We followed [Stoke's law](http://www.meracalculator.com/physics/fluid-mechanics/stokes-law.php) and used the following formula: $\rho_{particle}=(18\mu_{water}V_{mean})/gd^2 +\rho_{water}$ with:
+We dropped 19 water tracers in the middle of a water column, filmed and 
+extracted their trajectory, using ProAnalyst software (XCitex, Cambridge, MA, 
+USA).  
+We calculated the mean velocity of the tracer until stabilization and calculated
+the water tracer density. We followed [Stoke's law](http://www.meracalculator.com/physics/fluid-mechanics/stokes-law.php) and 
+used the following formula:   
+$\rho_{particle}=(18\mu_{water}V_{mean})/gd^2 +\rho_{water}$ with:
 
 - $\ g$ = 9.80665 m/s²  
-- $\ d$ = 0.00067 m corresponding to the mean diameter of particles (calculated on the day of the experiment)
+- $\ d$ = 0.00067 m corresponding to the mean diameter of particles (calculated 
+on the day of the experiment)
 - $\rho_{water}$ = 998.2 $\ kg/m^3$
-- $\mu_{water}$ = 0.0010016 $\ kg/(m·s)$  or 1.0016 mPa.s at 20°C, according to [IAPWS 2008 reference](http://www.viscopedia.com/viscosity-tables/substances/water/)
+- $\mu_{water}$ = 0.0010016 $\ kg/(m·s)$  or 1.0016 mPa.s at 20°C, according to 
+[IAPWS 2008 ref](http://www.viscopedia.com/viscosity-tables/substances/water/)
 
 ```{r density, echo= TRUE, eval= TRUE}
 # DENSITY calculation
@@ -88,9 +102,10 @@ V_Mean <- vector()
 V_Sd <- vector()
 
 g <- 9.80665  #in m/s²
-d <- 0.0006719836  # mean diameter of particles in m (calculated on the day of the experiment)
+d <- 0.0006719836  # mean diameter of particles in m
 rho_water <- 998.2  # in kg/m^3
-mu_water <-  0.0010016  # in kg/(m·s) or 1.0016 mPa.s à 20°C  data coming from http://www.viscopedia.com/viscosity-tables/substances/water/
+mu_water <-  0.0010016  # in kg/(m·s) or 1.0016 mPa.s à 20°C data coming from 
+# http://www.viscopedia.com/viscosity-tables/substances/water/
 
 
 # Variable initialization in Density_Data
@@ -104,7 +119,7 @@ for (i in 1:length(Density_Data)) {
   for (j in 2:(nrow(Density_Data[[i]]))) {
     Density_Data [[i]][j, 5] <-
       sqrt((Density_Data [[i]][j, 3] - Density_Data [[i]][j - 1, 3]) ^ 2 +
-             (Density_Data [[i]][j, 4] - Density_Data [[i]][j - 1, 4]) ^ 2) # Dist
+             (Density_Data [[i]][j, 4] - Density_Data [[i]][j - 1, 4]) ^ 2)
     Density_Data [[i]][j, 6] <- Density_Data[[i]][j, 5] / 0.02 # Velocity
   }
   
@@ -145,10 +160,15 @@ Result_density <-
 
 ```
 
-We obtain a mean value of $\rho$ = `r round(mean(Result_density$rho), digits = 2) ` $\pm$ `r  round(x=sd(Result_density$rho), digits=2) `$kg/m^3$
+We obtain a mean value of 
+$\rho$ = `r round(mean(Result_density$rho), digits = 2) ` $\pm$ 
+`r  round(x=sd(Result_density$rho), digits=2) `$kg/m^3$
 
-The distance to $\rho_{water}$ = `r round(x=mean (Result_density$rho - Result_density$rho_water[1]), digits=2) ` $\pm$ `r round(x=sd(Result_density$rho-Result_density$rho_water[1]), digits=2)` $kg/m^3$ 
-The repartition of the data can be vizualized in the following plot, with the horizontal line corresponding to $\rho_{water}$.  
+The distance to $\rho_{water}$ = `r round(x=mean (Result_density$rho - Result_density$rho_water[1]), digits=2) ` $\pm$ 
+`r round(x=sd(Result_density$rho-Result_density$rho_water[1]), digits=2)`
+$kg/m^3$ 
+The repartition of the data can be vizualized in the following plot, with the 
+horizontal line corresponding to $\rho_{water}$.  
 
 
 ```{r plot_rho, echo=FALSE}
@@ -184,14 +204,19 @@ Density_estimation
 
 This plot corresponds to the Figure 6c and 6d in the manuscript. 
 
-We considered that the density of water tracers was close enough to the density of water to use them in the experiment.  
+We considered that the density of water tracers was close enough to the density 
+of water and used them in the experiment.  
+   
+   
 
 
 # Hydrodynamic mechanism
 
-## Waterflow trajectory and velocity during the entire sequence of suction feeding
+## Waterflow trajectory and velocity during a sequence of suction feeding
 
-We plot the trajectory and velocity of the food (one item) with the mean and standard deviation of the water tracers over time by calling the plot_mean function. These plots correspond to the Figure 2 in the manuscript. 
+We plot the trajectory and velocity of the food (one item) with the mean and 
+standard deviation of the water tracers over time by calling the plot_mean 
+function. These plots correspond to the Figure 2 in the manuscript. 
 
 ### Example of C2P1T04 (Carp 2, one food item, trial 4):
 
@@ -207,18 +232,22 @@ color <- c(palette_IOFLOW[13], # grey
 # Tx plot
 xlab <- "time (s)"
 ylab <- "Tx (cm)"
-d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), time = Timing[[trial]]$time)
+d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), 
+           time = Timing[[trial]]$time)
 subtitle <- "Antero-posterior trajectory"
 
-plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, subtitle = subtitle, color = color)
+plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, subtitle = subtitle, 
+                             color = color)
 
 # Vx plot
 xlab <- "time (s)"
 ylab <- "Vx (cm/s)"
-d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), time = Timing[[trial]]$time)
+d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), 
+           time = Timing[[trial]]$time)
 subtitle <- "Antero-posterior velocity"
 
-plot.Vx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color, subtitle = subtitle)
+plot.Vx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, 
+                             color = color, subtitle = subtitle)
 
 
 # plot the combination of the two plots
@@ -240,20 +269,24 @@ trial <- "T1P1T06"
 xlab <- "time (s)"
 ylab <- "Tx (cm)"
 
-d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), time = Timing[[trial]]$time)
+d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), 
+           time = Timing[[trial]]$time)
 subtitle <- "Antero-posterior trajectory"
 
-plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, subtitle = subtitle, color = color)
+plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, 
+                             subtitle = subtitle, color = color)
 
 
 # Vx plot
 xlab <- "time (s)"
 ylab <- "Vx (cm/s)"
 
-d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), time = Timing[[trial]]$time)
+d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), 
+           time = Timing[[trial]]$time)
 subtitle <- "Antero-posterior velocity"
 
-plot.Vx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color, subtitle = subtitle)
+plot.Vx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, 
+                             color = color, subtitle = subtitle)
 
 plot.Tx_T1P1T06
 plot.Vx_T1P1T06
@@ -262,7 +295,8 @@ plot.Vx_T1P1T06
 
 ## Distance covered by Food vs Water tracers
 
-We calculate the iterative distance covered by the water and food tracers (**WF**) at each frame, over a sequence of suction feeding. 
+We calculate the iterative distance covered by the water and food tracers 
+(**WF**) at each frame, over a sequence of suction feeding. 
 We store this in a list we named **Distance_WF**.
 
 ```{r iterative_distance, echo=TRUE, message=FALSE, warning=FALSE}
@@ -291,7 +325,9 @@ Distance_WF <- mapply(FUN = data.frame,
 
 ### Total distance for each tracer, cumulated on the entire sequence
 
-We calculate the total distance covered by each tracer over the entire sequence, by summing the previously computed iterative distances. We name this variable **Sum_dist_WF**.
+We calculate the total distance covered by each tracer over the entire sequence,
+by summing the previously computed iterative distances. We name this 
+variable **Sum_dist_WF**.
 
 ```{r cumulative_distance, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -307,8 +343,12 @@ Sum_dist_WF <-
 
 ### Average of the Total distance cumulated on the entire sequence
 
-We compute the mean and standard deviation of the cumulative distance  **Sum_dist_WF** for each species and each type of tracer (food and water).   
-For the water tracers, the cumulative distance is averaged over all the water tracers of the trial. As there was one to three markers implanted in one food item, the standard deviation for the food tracers is low or corresponds to a NA when only one marker remained.
+We compute the mean and standard deviation of the cumulative distance 
+**Sum_dist_WF** for each species and each type of tracer (food and water).   
+For the water tracers, the cumulative distance is averaged over all the water 
+tracers of the trial. As there was one to three markers implanted in one food 
+item, the standard deviation for the food tracers is low or corresponds to a
+NA when only one marker remained.
 
 ```{r compute_species_item, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -330,7 +370,8 @@ Tilapias_water <-compute_species_item(species = "tilapia",
 
 ```
 
-For example, **Carps_food** is a list with the mean and standard deviation of the cumulative distance of each trial for the food item
+For example, **Carps_food** is a list with the mean and standard deviation of 
+the cumulative distance of each trial for the food item
 
 ```{r Carps_food, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -338,19 +379,23 @@ glimpse(Carps_food[1:2])
 
 ```
 
-We combine the food and water average and standard deviation, using the **tidy_data2** function.
+We combine the food and water average and standard deviation, using the 
+**tidy_data2** function.
 
 ```{r Mean_list_combination, echo=TRUE, message=FALSE, warning=FALSE}
 
-Carp_names <- names(Sum_dist_WF)[starts_with(match = "C", vars = names(Sum_dist_WF))]
+Carp_names <- names(Sum_dist_WF)[starts_with(match = "C",
+                                             vars = names(Sum_dist_WF))]
 Carps_distance <- tidy_data2(Carp_names, Carps_food, Carps_water)
 
-Tilapia_names <- names(Sum_dist_WF)[starts_with(match = "T", vars = names(Sum_dist_WF))]
+Tilapia_names <- names(Sum_dist_WF)[starts_with(match = "T",
+                                                vars = names(Sum_dist_WF))]
 Tilapias_distance <- tidy_data2(Tilapia_names, Tilapias_food, Tilapias_water)
 
 ```
 
-For example, **Carps_distance** is a list with the mean and standard deviation of the cumulative distance of each trial for both the food and water tracers.
+For example, **Carps_distance** is a list with the mean and standard deviation 
+of the cumulative distance of each trial for both the food and water tracers.
 
 ```{r Carps_distance, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -358,9 +403,10 @@ glimpse(Carps_distance[1])
 
 ```
 
-### Table combining the distance cumulated on the entire sequence for both types of tracers and each species
+### Table with distance cumulated on the entire sequence 
 
-We build a table with all the important information about the cumulative distance of food and water tracers.
+We build a table with all the important information about the cumulative 
+distance of food and water tracers.
 
 ```{r Table_mean_data, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -374,13 +420,17 @@ Carps_mean <- data.frame(
   item = c(rep("food", length(Carp_names)), rep("water", length(Carp_names))))
 
 Tilapias_mean <- data.frame(
-  mean = c(map_dbl(.x = Tilapia_names, .f = ~Tilapias_food[[.]]$Tilapias_food_mean ),
-           map_dbl(.x = Tilapia_names, .f = ~Tilapias_water[[.]]$Tilapias_water_mean)),
+  mean = c(map_dbl(.x = Tilapia_names,
+                   .f = ~Tilapias_food[[.]]$Tilapias_food_mean ),
+           map_dbl(.x = Tilapia_names, 
+                   .f = ~Tilapias_water[[.]]$Tilapias_water_mean)),
   sd = c(rep(NA, length(Tilapia_names)),
-         map_dbl(.x = Tilapia_names, .f = ~Tilapias_water[[.]]$Tilapias_water_sd)),
+         map_dbl(.x = Tilapia_names, 
+                 .f = ~Tilapias_water[[.]]$Tilapias_water_sd)),
   species = 'Tilapias',
   trials = rep(Tilapia_names, 2), 
-  item = c(rep("food", length(Tilapia_names)),rep("water", length(Tilapia_names))))
+  item = c(rep("food", length(Tilapia_names)),rep("water", 
+                                                  length(Tilapia_names))))
 
 ```
 
@@ -410,9 +460,10 @@ These data correspond to the Table 1 in the manuscript.
 
 ### Histogram of the total distance covered by food and water tracers
 
-We use the previous table to plot an histogramm with the relevant variables. This histogram corresponds to a visualisation of Table 1.
+We use the previous table to plot an histogramm with the relevant variables. 
+This histogram corresponds to a visualisation of Table 1.
 
-```{r Dist_histogram, echo=TRUE, fig.width=5, fig.show='hold',fig.align='center'}
+```{r Dist_histogram, echo=TRUE, fig.width=5, fig.show='hold',                             fig.align='center'}
 
 
 carp_bar <-
@@ -449,13 +500,15 @@ tilapia_bar
 
 ```
 
-The food tracers don't have any standard deviation bars because all the markers were on the same food item.
+The food tracers don't have any standard deviation bars because all the markers
+were on the same food item.
 
 
 
 ## Phases during a suction feeding sequence
 
-To automatically detect the different phases during a trial, we use a combination of information about the water tracers velocity and trajectory.
+To automatically detect the different phases during a trial, we use a
+combination of information about the water tracers velocity and trajectory.
 We focus on the water tracers to determine the different phases.
 
 
@@ -483,7 +536,8 @@ Mean_v_t_W <-  mapply(
   frame = Frame,
   SIMPLIFY = FALSE)
 
-# compute the differences at each row of Mean_v_t_W to obtain a trend (+ or -) and add it to Mean_v_t_W
+# compute the differences at each row of Mean_v_t_W to obtain a trend (+ or -) 
+#and add it to Mean_v_t_W
 
 Phase <- map(.x = Trials,
              .f = ~ Mean_v_t_W[[.]] %>%
@@ -491,25 +545,26 @@ Phase <- map(.x = Trials,
                mutate(diff_average_tx = average_tx - lag(average_tx))) %>%
   set_names(names(Mean_v_t_W))
 
-# compute a label (stasis, reverse flow, transport) associated with a given combination of value for average_vx, and diff_average_vx
+# compute a label (stasis, reverse flow, transport) associated with a given 
+#combination of value for average_vx, and diff_average_vx
 
 Phase <-  map(.x = Trials,
               .f = ~ mutate(.data = Phase[[.]],
                             phase = 
                               case_when(
                                 frame < Sequence$end_FS[[.]] &
-                                  frame > Sequence$beg_FS[[.]] ~ 1, # first strike
+                                frame > Sequence$beg_FS[[.]] ~ 1,#first strike
                                 average_vx < 2 &
-                                  average_vx > -4.5 &
-                                  diff_average_vx < 0.4 &
-                                  diff_average_vx > -0.4 ~ 0,       #stasis
-                                average_vx > 0.05 ~ -1,             # reverse flow
-                                average_vx < 0.05 ~ 2)              # back flow
+                                average_vx > -4.5 &
+                                diff_average_vx < 0.3 &
+                                diff_average_vx > -0.3 ~ 0,      #stasis
+                                average_vx > 0.05 ~ -1,          #reverse flow
+                                average_vx < 0.05 ~ 2)           #back flow
                             )) %>% 
   set_names(names(Mean_vx_W_2))
 
 
-# Extract the phase list, corresponding to the previous labels for each trial over time.
+# Extract the phase list, corresponding to the previous labels for each trial
 phase <-  map(.x = Trials,
               .f = ~ get_sublist(lst = Phase[[.]], group_name = "phase")) %>%
   set_names(names(Phase))
@@ -519,7 +574,7 @@ phase <-  map(.x = Trials,
 
 ### Test for the phase extraction
 
-We test the phase detection on the different trials. Here we chose "T1P1T09".
+We test the phase detection on the different trials. Here we chose "C2P1T04".
 
 ```{r Phases, echo=TRUE, message=FALSE, warning=FALSE, fig.width=5, fig.show='hold',fig.align='center'}
 
@@ -586,7 +641,8 @@ plot.TrajectoryX_mean
 
 ### Periodicity of the phases
 
-To describe the suction feeding waterflow we will compute the periodicity of the different phases.
+To describe the suction feeding waterflow we will compute the periodicity of the
+different phases.
 After the first strike, we export the peaks of tx over time
 
 ```{r}
@@ -602,11 +658,16 @@ We want to extract the duration between each transition reverse/back flow:
 
 ```{r}
 
-diff_peaks <- map(.x = Trials, .f = ~diff(peaks[[.]])) %>% set_names(names(Phase))
+diff_peaks <- map(.x = Trials, 
+                  .f = ~diff(peaks[[.]])) %>% set_names(names(Phase))
 
 # Mean and sd calculation among the different transitions
-mean_peaks <- map(.x = Trials, .f = ~mean(diff_peaks[[.]], na.rm = TRUE)) %>% set_names(names(Phase))
-sd_peaks <-map(.x = Trials, .f = ~sd(diff_peaks[[.]], na.rm = TRUE)) %>% set_names(names(Phase))
+mean_peaks <- map(.x = Trials, 
+                  .f = ~mean(diff_peaks[[.]], na.rm = TRUE)) %>%
+  set_names(names(Phase))
+
+sd_peaks <-map(.x = Trials, .f = ~sd(diff_peaks[[.]], na.rm = TRUE)) %>% 
+  set_names(names(Phase))
 
 # Mean and sd calculation among the different trials of the same species
 mean_peaks_Carps <- c(
@@ -619,36 +680,56 @@ mean_peaks_Tilapias <- c(
 
 ```
 
-For the carps, the transition between a reverse and a backflow happens every `r round(mean_peaks_Carps[1], digits = 2)` $\pm$ `r round(mean_peaks_Carps[2], digits = 2)` $s$   
-For the tilapias, the transition between a reverse and a backflow happens every `r round(mean_peaks_Tilapias[1], digits = 2)` $\pm$ `r round(mean_peaks_Tilapias[2], digits = 2)` $s$
+For the carps, the transition between a reverse and a backflow happens every 
+`r round(mean_peaks_Carps[1], digits = 2)` $\pm$
+`r round(mean_peaks_Carps[2], digits = 2)` $s$   
+For the tilapias, the transition between a reverse and a backflow happens every
+`r round(mean_peaks_Tilapias[1], digits = 2)` $\pm$ 
+`r round(mean_peaks_Tilapias[2], digits = 2)` $s$
 
 
 ## Velocity amplitudes
 
-To describe the waterflow over time, we need to compute several values, including maximum velocity amplitudes for the different phases in both carps and tilapias.
+To describe the waterflow over time, we need to compute several values, 
+including maximum velocity amplitudes for the different phases in both carps 
+and tilapias.
 
 #### First strike
 
-We use the minimum of the **average_VX** data to obtain the maximum amplitude the water tracers motion during the first strike as the X axis is pointing toward the back of the buccal cavity.
+We use the minimum of the **average_VX** data to obtain the maximum amplitude 
+the water tracers motion during the first strike as the X axis is pointing 
+toward the back of the buccal cavity.
 
 ```{r FirstStrike_magnitude, echo=TRUE, message=FALSE, warning=FALSE}
 
 # List of the Water tracers variables
 Data_W <- mapply(FUN = data.frame, Timing, phase,
-               map(Trials, ~set_names(x =Mean_tx_W[[.]][2],nm = rep("average_TX", length(.)))),
-               map(Trials, ~set_names(x =Mean_ty_W[[.]][2],nm = rep("average_TY", length(.)))),
-               map(Trials, ~set_names(x =Mean_tz_W[[.]][2],nm = rep("average_TZ", length(.)))),
-               map(Trials, ~set_names(x =Mean_tx_W[[.]][3],nm = rep("sd_TX", length(.)))),
-               map(Trials, ~set_names(x =Mean_ty_W[[.]][3],nm = rep("sd_TY", length(.)))),
-               map(Trials, ~set_names(x =Mean_tz_W[[.]][3],nm = rep("sd_TZ", length(.)))),
-               
-               map(Trials, ~set_names(x =Mean_vx_W[[.]][2],nm = rep("average_VX", length(.)))),
-               map(Trials, ~set_names(x =Mean_vy_W[[.]][2],nm = rep("average_VY", length(.)))),
-               map(Trials, ~set_names(x =Mean_vz_W[[.]][2],nm = rep("average_VZ", length(.)))),
-               map(Trials, ~set_names(x =Mean_vx_W[[.]][3],nm = rep("sd_VX", length(.)))),
-               map(Trials, ~set_names(x =Mean_vy_W[[.]][3],nm = rep("sd_VY", length(.)))),
-               map(Trials, ~set_names(x =Mean_vz_W[[.]][3],nm = rep("sd_VZ", length(.)))),
-               SIMPLIFY=FALSE) %>%
+         map(Trials,
+             ~set_names(x=Mean_tx_W[[.]][2],nm = rep("average_TX", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_ty_W[[.]][2],nm = rep("average_TY", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_tz_W[[.]][2],nm = rep("average_TZ", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_tx_W[[.]][3],nm = rep("sd_TX", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_ty_W[[.]][3],nm = rep("sd_TY", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_tz_W[[.]][3],nm = rep("sd_TZ", length(.)))),
+         
+         map(Trials, 
+             ~set_names(x=Mean_vx_W[[.]][2],nm = rep("average_VX", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_vy_W[[.]][2],nm = rep("average_VY", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_vz_W[[.]][2],nm = rep("average_VZ", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_vx_W[[.]][3],nm = rep("sd_VX", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_vy_W[[.]][3],nm = rep("sd_VY", length(.)))),
+         map(Trials,
+             ~set_names(x=Mean_vz_W[[.]][3],nm = rep("sd_VZ", length(.)))),
+         SIMPLIFY=FALSE) %>%
   set_names(names(Timing))
 
 
@@ -673,15 +754,21 @@ Vx_FS_Tilapias <- abs(Vx_FS[8:13])
 
 ```
 
-- For the carps, the maximum amplitude during the first strike is `r round(mean(Vx_FS_Carps), digits = 2) ` $\pm$ `r round(x=sd(Vx_FS_Carps), digits=2) ` $cm/s$.  
-- For the tilapias, the maximum amplitude during the first strike is `r round(mean(Vx_FS_Tilapias), digits = 2) ` $\pm$ `r round(x=sd(Vx_FS_Tilapias), digits=2) ` $cm/s$.
+- For the carps, the maximum amplitude during the first strike is 
+`r round(mean(Vx_FS_Carps), digits = 2) ` $\pm$ 
+`r round(x=sd(Vx_FS_Carps), digits=2) ` $cm/s$.  
+- For the tilapias, the maximum amplitude during the first strike is `r round(mean(Vx_FS_Tilapias), digits = 2) ` 
+$\pm$ `r round(x=sd(Vx_FS_Tilapias), digits=2) ` $cm/s$.
   
-The high standard deviation for the carps is due to trial C1P2T13, with a huge amplitude compared to the other trials.
+The high standard deviation for the carps is due to trial C1P2T13, with a huge 
+amplitude compared to the other trials.
 
 
 #### Reverse flow 
 
-We use the maximum of the **average_VX** data to obtain the maximum amplitude the water tracers motion during the reverse flow because the X axis is pointing toward the back of the buccal cavity.
+We use the maximum of the **average_VX** data to obtain the maximum amplitude
+the water tracers motion during the reverse flow because the X axis is pointing
+toward the back of the buccal cavity.
 
 ```{r ReverseFlow_magnitude, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -706,13 +793,18 @@ Vx_RF_Tilapias <- abs(Vx_RF[8:13])
 
 ```
 
-- For the carps, the maximum velocity amplitude is `r round(mean(Vx_RF_Carps), digits = 2) ` $\pm$   `r round(x=sd(Vx_RF_Carps), digits=2) ` $cm/s$  
-- For the tilapias, the maximum velocity amplitude is `r round(mean(Vx_RF_Tilapias), digits = 2) ` $\pm$ `r round(x=sd(Vx_RF_Tilapias), digits=2) ` $cm/s$
+- For the carps, the maximum velocity amplitude is
+`r round(mean(Vx_RF_Carps), digits = 2) ` $\pm$   
+`r round(x=sd(Vx_RF_Carps), digits=2) ` $cm/s$  
+- For the tilapias, the maximum velocity amplitude is 
+`r round(mean(Vx_RF_Tilapias), digits = 2) ` $\pm$ 
+`r round(x=sd(Vx_RF_Tilapias), digits=2) ` $cm/s$
   
 
 ## Relative proportion of tx, ty, tz 
 
-We want to calculate the relative contribution of each component of the trajectory. 
+We want to calculate the relative contribution of each component of the 
+trajectory. 
 
 ```{r Data_Proportion , echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -736,13 +828,15 @@ Data_Proportion <-  map(.x = Trials,
 
 ```
 
-Based on these data, we plot an histogram corresponding to the x, y, and z components contribution for each phase of the suction feeding sequence among the 13 analyzed trials. 
+Based on these data, we plot an histogram corresponding to the x, y, and z 
+components contribution for each phase of the suction feeding sequence among 
+the 13 analyzed trials. 
 
 ### First strike
 
 We extract the first strike data, based on the "phase" variable. 
 
-```{r FirstStrike_component , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
+```{r FirstStrike_comp, echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 
 # reminder
 #  1: first strike
@@ -751,7 +845,7 @@ We extract the first strike data, based on the "phase" variable.
 #  2: back flow
 
 FirstStrike_comp <- map(.x = Trials,
-                        .f = ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 1), ]) %>%
+  .f = ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 1), ]) %>%
   set_names(names(Data_Proportion))
 
 
@@ -828,7 +922,8 @@ ggplot(data = Mean_FirstStrike_comp__,
 
 ### Reverse flow
 
-We extract the reverse flow data, based on the "phase" variable and plot the relative contribution of each variable during the reverse flow phase
+We extract the reverse flow data, based on the "phase" variable and plot the 
+relative contribution of each variable during the reverse flow phase
 
 ```{r RF_component , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 
@@ -840,7 +935,8 @@ We extract the reverse flow data, based on the "phase" variable and plot the rel
 #  2: back flow
 
 RF_comp <-
-  map(.x = Trials, ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == -1), ])  %>%
+  map(.x = Trials,
+      ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == -1), ])  %>%
   set_names(names(Data_Proportion))
 
 
@@ -894,7 +990,8 @@ ggplot(data = Mean_RF_comp__, aes(x = trials, y = mean, fill = component)) +
 
 ### Back Flow
 
-We extract the back flow data, based on the "phase" variable and plot the relative contribution of each variable during the back flow phase.
+We extract the back flow data, based on the "phase" variable and plot the 
+relative contribution of each variable during the back flow phase.
 
 ```{r BF_component , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 
@@ -905,7 +1002,8 @@ We extract the back flow data, based on the "phase" variable and plot the relati
 #  2: back flow
 
 BF_comp <-
-  map(.x = Trials, ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 2), ])  %>%
+  map(.x = Trials,
+      ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 2), ])  %>%
   set_names(names(Data_Proportion))
 
 
@@ -975,23 +1073,27 @@ color_components <-
 
 Mean_first_strike_Comp <-
   data.frame(
-    mean = c(map_dbl(
-      .x = comp,
-      .f = ~ mean(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component == . &
-                                            Mean_FirstStrike_comp__$species == "carps" , ]$mean, na.rm = TRUE)),
-      map_dbl(
-        .x = comp,
-        .f = ~ mean(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component == . &
-                                              Mean_FirstStrike_comp__$species == "tilapias", ]$mean, na.rm = TRUE))),
+mean = c(map_dbl(
+   .x = comp,
+   .f = ~ mean(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component ==. &
+                                            Mean_FirstStrike_comp__$species == 
+                                         "carps" , ]$mean, na.rm = TRUE)),
+    map_dbl(
+    .x = comp,
+    .f = ~ mean(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component ==. &
+                                              Mean_FirstStrike_comp__$species ==
+                                           "tilapias", ]$mean, na.rm = TRUE))),
     sd = c(map_dbl(
       .x = comp,
-      .f = ~ sd(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component == . &
-                                          Mean_FirstStrike_comp__$species == "carps" , ]$mean)),
+      .f = ~ sd(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component ==. &
+                                          Mean_FirstStrike_comp__$species == 
+                                          "carps" , ]$mean)),
     
     map_dbl(
       .x = comp,
-      .f = ~ sd(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component == . &
-                                          Mean_FirstStrike_comp__$species == "tilapias" , ]$mean, na.rm = TRUE))),
+      .f = ~ sd(Mean_FirstStrike_comp__[Mean_FirstStrike_comp__$component ==. &
+                                        Mean_FirstStrike_comp__$species ==
+                                          "tilapias" , ]$mean, na.rm = TRUE))),
     species = c(rep("carps", 3), rep("tilapias", 3)),
     component = rep(c("tx", "ty", "tz"), 2))
 
@@ -1026,12 +1128,14 @@ Mean_RF_Comp <-  data.frame(
   mean = c(map_dbl(
     .x = comp,
     .f = ~ mean(Mean_RF_comp__[Mean_RF_comp__$component == . &
-                                 Mean_RF_comp__$species == "carps" ,]$mean, na.rm = TRUE)
+                                 Mean_RF_comp__$species == "carps" ,]$mean, 
+                na.rm = TRUE)
   ),
   map_dbl(
     .x = comp,
     .f = ~ mean(Mean_RF_comp__[Mean_RF_comp__$component == . &
-                                 Mean_RF_comp__$species == "tilapias" ,]$mean, na.rm = TRUE)
+                                 Mean_RF_comp__$species == "tilapias" ,]$mean, 
+                na.rm = TRUE)
   )),
   sd = c(map_dbl(
     .x = comp,
@@ -1042,7 +1146,8 @@ Mean_RF_Comp <-  data.frame(
   map_dbl(
     .x = comp,
     .f = ~ sd(Mean_RF_comp__[Mean_RF_comp__$component == . &
-                               Mean_RF_comp__$species == "tilapias" ,]$mean, na.rm = TRUE)
+                               Mean_RF_comp__$species == "tilapias" ,]$mean, 
+              na.rm = TRUE)
   )),
   species = c(rep("carps", 3), rep("tilapias", 3)),
   component = rep(c("tx", "ty", "tz"), 2)
@@ -1080,20 +1185,24 @@ Mean_BF_Comp <-
     mean = c(map_dbl(
       .x = comp,
       .f = ~ mean(Mean_BF_comp__[Mean_BF_comp__$component == . &
-                                   Mean_BF_comp__$species == "carps", ]$mean, na.rm = TRUE)
+                                   Mean_BF_comp__$species == "carps", ]$mean,
+                  na.rm = TRUE)
     ), map_dbl(
       .x = comp,
       .f = ~ mean(Mean_BF_comp__[Mean_BF_comp__$component == . &
-                                   Mean_BF_comp__$species == "tilapias", ]$mean, na.rm = TRUE)
+                                   Mean_BF_comp__$species == "tilapias", ]$mean, 
+                  na.rm = TRUE)
     )),
     sd = c(map_dbl(
       .x = comp,
       .f = ~ sd(Mean_BF_comp__[Mean_BF_comp__$component == . &
-                                 Mean_BF_comp__$species == "carps" , ]$mean, na.rm = TRUE)
+                                 Mean_BF_comp__$species == "carps" , ]$mean, 
+                na.rm = TRUE)
     ), map_dbl(
       .x = comp,
       .f = ~ sd(Mean_BF_comp__[Mean_BF_comp__$component == . &
-                                 Mean_BF_comp__$species == "tilapias" , ]$mean, na.rm = TRUE)
+                                 Mean_BF_comp__$species == "tilapias" , 
+                               ]$mean, na.rm = TRUE)
     )),
     species = c(rep("carps", 3), rep("tilapias", 3)),
     component = rep(c("tx", "ty", "tz"), 2)
@@ -1101,7 +1210,8 @@ Mean_BF_Comp <-
 
 
 hist_BF <-
-  ggplot(data = Mean_BF_Comp, aes(x = component, y = mean * 100, fill = component)) +
+  ggplot(data = Mean_BF_Comp, 
+         aes(x = component, y = mean * 100, fill = component)) +
   geom_bar(stat = "identity", 
            position = position_dodge()) +
   geom_errorbar(
@@ -1125,22 +1235,34 @@ hist_BF
 
 ```
 
-During each phase, the anterio posterior component is the most important one. The vertical component is more important for the tilapias compared with the carps, especially during the reverse and back flows.    
+During each phase, the anterio posterior component is the most important one. 
+The vertical component is more important for the tilapias compared with
+the carps, especially during the reverse and back flows.    
 
 
 
 ## Divergence 
 
-We hypothesize that the waterflow, exiting through the opercula during each backflow, causes a passive sorting based on the different mass of the ingested particles. The inertia effect would lead the biggest particles (food item) to stay on the same path, following a midsagittal trajectory towards the esophagus. The cycles reverse flow / back flow put the tracers in suspension in the buccal cavity and increase the probability to be sensed with appropriate sensory organs and trapped (actively) by the pharyngeal jaws if they correspond to a food item. 
+We hypothesize that the waterflow, exiting through the opercula during each 
+backflow, causes a passive sorting based on the different mass of the ingested
+particles. The inertia effect would lead the biggest particles (food item) to
+stay on the same path, following a midsagittal trajectory towards the esophagus.
+The cycles reverse flow / back flow put the tracers in suspension in the buccal
+cavity and increase the probability to be sensed with appropriate sensory organs
+and trapped (actively) by the pharyngeal jaws if they correspond to a food item. 
 
-We explored this hypothesis by detecting the shift in the waterflow trajectory in comparison to the food tracer trajectory.  
-  -> Calculating the angle formed by the position of a given particle during three consecutive frame  
-  -> Calculating the curvature formed by the position of a given particle during three consecutive frame  
+We explored this hypothesis by detecting the shift in the waterflow trajectory 
+in comparison to the food tracer trajectory.  
+  - Calculating the angle formed by the position of a given particle during 
+  three consecutive frame  
+  - Calculating the curvature formed by the position of a given particle during
+  three consecutive frame  
 
 
 ### Data preparation
 
-We store all the tx, ty, and tz for all the particles of the first strike of each trial in a list.
+We store all the tx, ty, and tz for all the particles of the first strike of
+each trial in a list.
 
 ```{r}
 
@@ -1150,7 +1272,8 @@ Trajectory <- map(.x = Trials, .f = ~Map(as.data.frame(cbind),
                                     WF_tz = WF_tz [[.]][],     
                                     Time = Phase[[.]][11]/750,
                                     Frame = Phase[[.]][11],
-                                    Phase = Phase[[.]][14])) %>% set_names(names(Maya_WF))
+                                    Phase = Phase[[.]][14])) %>% 
+  set_names(names(Maya_WF))
 
 
 Trajectory_df <- list_to_df(list = Trajectory, id.vars = c(
@@ -1176,23 +1299,31 @@ Specimens <- levels(factor(substr(names(Maya_WF), start = 1, stop = 2)))
 # list all the trials associated with one specimen 
 Trial_Specimens <- map(.x = Specimens,
                        .f =~levels(factor(Trajectory_df$Trials))[
-                         which(substr(levels(factor(Trajectory_df$Trials)), start = 1, stop = 2) == .)]
+                         which(substr(levels(factor(Trajectory_df$Trials)), 
+                                      start = 1, stop = 2) == .)]
                          ) %>%  set_names(Specimens)
 
 # create a df with the data for the First Strike
 
-FS <-  Trajectory_df  %>%  filter(Phase == "1") %>% mutate(Grp = paste(Particles,Trials, sep="_"))
+FS <-  Trajectory_df  %>%  filter(Phase == "1") %>% 
+  mutate(Grp = paste(Particles,Trials, sep="_"))
 
-FS_Specimen <- map(.x = c(1:4), .f = ~subset(FS, subset= is.element(Trials, Trial_Specimens[[.]]))) %>% set_names(Specimens)
+FS_Specimen <- map(.x = c(1:4), 
+                   .f = ~subset(FS, 
+                                subset= is.element(Trials,
+                                                   Trial_Specimens[[.]]))) %>% set_names(Specimens)
 
-FS_Trial <- map(.x = Trials, .f = ~filter(FS, Trials == names(Maya_WF)[.])) %>% set_names(names(Maya_WF))
+FS_Trial <- map(.x = Trials, 
+                .f = ~filter(FS, Trials == names(Maya_WF)[.])) %>% set_names(names(Maya_WF))
 
            
 ```
 
 ### Trajectory cleaning
 
-We want to filter and clean the data to only have the First Strike without and clean the trajectory of the particles that circle back towards the entrance of the mouth.
+We want to filter and clean the data to only have the First Strike and 
+clean the trajectory of the particles that circle back towards the entrance of 
+the mouth.
 We also add a calculation of the percentage of the anteroposterior position  
 - 0% corresponds to the entrance of the mouth  
 - 100% corresponds to the entrance of the esophagus.  
@@ -1204,7 +1335,8 @@ FS_Trial_clean <- list()
 for(trial in Trials){
   data <- FS_Trial[[trial]]
   
-  # we start the analysis when the particles passed the entrance of the mouth (different between specimens) 
+  # we start the analysis when the particles passed the entrance of the mouth 
+  #(different between specimens) 
   if (str_starts(string = names(Maya_WF)[trial], pattern = "C2")) {
     data_cut <- data %>% filter(WF_tx > 0) %>%
       filter(WF_tx < 4) 
@@ -1213,15 +1345,16 @@ for(trial in Trials){
       filter(WF_tx < 6)
   }
   
-  # We want to clean the particles that circle back towards the entrance of the mouth (using lag)
+  # We want to clean the particles that circle back towards the entrance of 
+  #the mouth (using lag)
   
-  Particles <- levels(factor(data_cut$Grp)) # all particles in a given trial of Trial
+  Particles <- levels(factor(data_cut$Grp)) # all particles in a given trial 
   
   Curling <- list()
   data_cut_clean <- 0
   for (i in 1:length(Particles)){
     A <- data_cut[which(data_cut$Grp == Particles[i]),]
-    Curling[[i]] <- which(diff(x = A$WF_tx, lag = 1) >0)[1]  # gives the beginning of the curling
+    Curling[[i]] <- which(diff(x = A$WF_tx, lag = 1)>0)[1] #beginning of curling
     if (is.na(Curling[[i]]) == TRUE) { Curling[[i]] = nrow(A) }
     
     A <- A[1: Curling[[i]],]
@@ -1231,7 +1364,8 @@ for(trial in Trials){
   Curling <- Curling %>% set_names(Particles)
   data_cut_clean <- data_cut_clean[-1,]
   
-  data_cut_clean$WF_tx_pcent <- 100 - data_cut_clean$WF_tx/(max(data_cut_clean$WF_tx, na.rm=TRUE ))*100
+  data_cut_clean$WF_tx_pcent <- 100 - data_cut_clean$WF_tx/
+    (max(data_cut_clean$WF_tx, na.rm=TRUE ))*100
   
   FS_Trial_clean[[trial]] <- data_cut_clean
   
@@ -1243,7 +1377,7 @@ FS_Trial_clean <- FS_Trial_clean %>% set_names(names(Maya_WF)[Trials])
 
 We can visualize the cleaning process for a given trial (C2P1T04).
 
-```{r, fig.width=5, fig.show='hold',fig.align='center'}
+```{r, fig.width=5, fig.show='hold', fig.align='center'}
 # FOR VISUALIZATION
 # all the data for a given trial (several trials)
 
@@ -1265,13 +1399,14 @@ labs(subtitle = trial )+
       theme_minimal()+ ylim(-3,3)+
     theme(legend.position = "none")
 
-# We want to clean the particles that circle back towards the entrance of the mouth (using lag)
-Particles <- levels(factor(data_cut_example$Grp)) # all particles in a given trial of Trial
+# We want to clean the particles that circle back towards the entrance of 
+# the mouth (using lag)
+Particles <- levels(factor(data_cut_example$Grp)) 
 Curling <- list()
 data_cut_clean_example <- 0
 for (i in 1:length(Particles)){
   A <- data_cut_example[which(data_cut_example$Grp == Particles[i]),]
-  Curling[[i]] <- which(diff(x = A$WF_tx, lag = 1) >0)[1]  # gives the beginning of the curling
+  Curling[[i]] <- which(diff(x = A$WF_tx, lag = 1) >0)[1]  
   if (is.na(Curling[[i]]) == TRUE) { Curling[[i]] = nrow(A) }
   
   A <- A[1: Curling[[i]],]
@@ -1281,14 +1416,17 @@ Curling <- Curling %>% set_names(Particles)
 
 
 data_cut_clean_example <- data_cut_clean_example[-1,]
-data_cut_clean_example$WF_tx_pcent <- 100 - data_cut_clean_example$WF_tx/(max(data_cut_clean_example$WF_tx, na.rm=TRUE ))*100
+data_cut_clean_example$WF_tx_pcent <- 100 - data_cut_clean_example$WF_tx/(max(data_cut_clean_example$WF_tx, na.rm=TRUE))*100
 
 #plot of the cleaned path
 color <- c(palette_IOFLOW[13], palette_IOFLOW, palette_IOFLOW)
 
 
-data_cut_clean_Water_example <- data_cut_clean_example %>% filter(item == "W")
-data_cut_clean_Food_example <- data_cut_clean_example %>% filter(Grp == "A01_data.tx_C2P1T04")
+data_cut_clean_Water_example <- data_cut_clean_example %>% 
+  filter(item == "W")
+
+data_cut_clean_Food_example <- data_cut_clean_example %>% 
+  filter(Grp == "A01_data.tx_C2P1T04")
 
 ggplot(data = data_cut_clean_Water_example,
               aes(
@@ -1298,7 +1436,6 @@ ggplot(data = data_cut_clean_Water_example,
     ylim(-2,2)  +labs(subtitle = trial)+
     ylab("tz (cm)") +
     xlab("tx (cm)") +
-  # geom_path(data = data_cut_clean_Food_example, aes(group=Grp, color= item), size = 2)+
     scale_color_manual(values = color)+ ylim(-3,3)+
       theme_minimal()+
     theme(legend.position = "none")
@@ -1307,8 +1444,10 @@ ggplot(data = data_cut_clean_Water_example,
 ```
 
 
-Now we can compute the divergence in trajectory between the water tracers and the food tracers. 
-We calculate the curvature made by the trajectory of each particle in the medio-lateral angle.
+Now we can compute the divergence in trajectory between the water tracers and
+the food tracers. 
+We calculate the curvature made by the trajectory of each particle in the
+medio-lateral angle.
 
 
 ### Divergence calculation
@@ -1327,12 +1466,18 @@ for(trial in Trials){ # c(1:10,12:13)
       filter(WF_tx_pcent < 100) 
     
     if (nrow(Temp_particle) <= 1) {
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- 
+        NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- 
+        NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- 
+        NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <-
+        NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- 
+        NA
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- 
+        NA
       
   }
   else{
@@ -1341,18 +1486,25 @@ for(trial in Trials){ # c(1:10,12:13)
       B <- unlist(Temp_particle[j,1:3])
       C <- unlist(Temp_particle[(j+span),1:3]) 
 
-      A[2] <- 0 # we delete the y coordinate to calculate the divergence data in the dorsoventral view (medio-lateral)
+      A[2] <- 0 #delete y coordinate (mediolateral motions)
       B[2] <- 0
       C[2] <- 0
       
-      name <- str_replace(string = Particles[i], pattern =  "_data.tx", replacement = "" )
-    
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(compute_divergence(A,B,C)[1])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- as.vector(compute_divergence(A,B,C)[2])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- unlist(Temp_particle $ WF_tx_pcent[j])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- unlist(Temp_particle[j,1])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- unlist(Temp_particle[j,2])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- unlist(Temp_particle[j,3]) 
+      name <- str_replace(string = Particles[i], pattern =  "_data.tx",
+                          replacement = "" )
+      
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <-
+  as.vector(compute_divergence(A,B,C)[1])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <-
+  as.vector(compute_divergence(A,B,C)[2])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <-
+  unlist(Temp_particle $ WF_tx_pcent[j])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <-
+  unlist(Temp_particle[j,1])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <-
+  unlist(Temp_particle[j,2])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <-
+  unlist(Temp_particle[j,3]) 
         }
   }
   }
@@ -1360,195 +1512,311 @@ for(trial in Trials){ # c(1:10,12:13)
 
 Divergence_clean <- Divergence
 
-Divergence_clean[["T2P1T10"]] <- NULL
+Divergence_clean[["T2P1T10"]] <- NULL # we delete "T2P1T10" trial because the 
+# food is not swallowed by the fish
 
 
 
 
 ```
 
-We need to transform the Divergence list into a data.frame with the particle name, angle, curvature, tx, tx_pcent, and tz.  
+We need to transform the Divergence list into a data.frame with the particle 
+name, angle, curvature, tx, tx_pcent, and tz.  
 
 
 ```{r}
 
-Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE), recursive = FALSE)
+Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE), 
+                             recursive = FALSE)
 
 # we divide between angle, tx, tx_pcent, and tz (same length):
-Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list), pattern = "angle"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list),
+                                          pattern = "angle"), 
+                           .f = ~get_sublist(lst = Divergence_df_list, 
+                                             group_name =
+                                               names(Divergence_df_list)[[.]]))
 
-Divergence_df_curvature <- map(.x = str_which(string = names(Divergence_df_list), pattern = "curvature"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_curvature <- map(.x = str_which(string = names(Divergence_df_list),
+                                    pattern = "curvature"), 
+                               .f = ~get_sublist(lst = Divergence_df_list,
+                                     group_name =
+                                       names(Divergence_df_list)[[.]]))
 
-Divergence_df_tx_pcent <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tx_pcent"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_tx_pcent <- map(.x = str_which(string = names(Divergence_df_list), 
+                                             pattern = "_tx_pcent"), 
+                              .f = ~get_sublist(lst = Divergence_df_list,
+                                     group_name =
+                                       names(Divergence_df_list)[[.]]))
 
 
-Divergence_df_tx <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tx"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_tx <- map(.x = str_which(string = names(Divergence_df_list), 
+                                       pattern = "_tx"), 
+                        .f = ~get_sublist(lst = Divergence_df_list,
+                                          group_name = 
+                                            names(Divergence_df_list)[[.]]))
 
-Divergence_df_ty <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_ty"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_ty <- map(.x = str_which(string = names(Divergence_df_list), 
+                                       pattern = "_ty"),
+                        .f = ~get_sublist(lst = Divergence_df_list,
+                                          group_name = 
+                                            names(Divergence_df_list)[[.]]))
 
-Divergence_df_tz <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tz"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_tz <- map(.x = str_which(string = names(Divergence_df_list), 
+                                       pattern = "_tz"), 
+                        .f = ~get_sublist(lst = Divergence_df_list,
+                                          group_name = 
+                                            names(Divergence_df_list)[[.]]))
 
 
-Divergence_df <- data.frame(particle = str_sub(string = melt(Divergence_df_angle)[,2], 
-                         start = 21, 
-                         end = (nchar(melt(Divergence_df_angle)[,2])-6)),
-      angle = melt(Divergence_df_angle)[,1],
-      curvature = melt(Divergence_df_curvature)[,1],
-      tx_pcent= melt(Divergence_df_tx_pcent)[,1], 
-      tx= melt(Divergence_df_tx)[,1], 
-      ty= melt(Divergence_df_ty)[,1],
-      tz= melt(Divergence_df_tz)[,1] )
+Divergence_df <- data.frame(particle = str_sub(string = 
+                                melt(Divergence_df_angle)[,2], 
+                                start = 21, 
+                                end = (nchar(melt(Divergence_df_angle)[,2])-6)),
+                            angle = melt(Divergence_df_angle)[,1],
+                            curvature = melt(Divergence_df_curvature)[,1],
+                            tx_pcent= melt(Divergence_df_tx_pcent)[,1], 
+                            tx= melt(Divergence_df_tx)[,1], 
+                            ty= melt(Divergence_df_ty)[,1],
+                            tz= melt(Divergence_df_tz)[,1] )
 
 # we add a column with the item category:
-Divergence_df <- Divergence_df %>% mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
-                             str_detect(string = particle, pattern = "A") ~ "F"))
-   
-# plot the trajectories
+Divergence_df <- Divergence_df %>% 
+  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                          str_detect(string = particle, pattern = "A") ~ "F"))
 
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% filter(str_detect(string = particle, pattern = "C")) %>% 
-ggplot(aes(y=tz, x=tx_pcent)) +
- geom_line(aes(group=particle, color= item), size = 0.8) +
- geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
-    ylab("tz") +
-    xlab("tx (cm)")+
-    scale_color_manual(values = color)+ labs(subtitle = "Carps")
-      theme_minimal() 
-
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% filter(str_detect(string = particle, pattern = "C", negate = TRUE)) %>% 
-ggplot(aes(y=tz, x=tx_pcent)) +
- geom_line(aes(group=particle, color= item), size = 0.8) +
- geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
-    ylab("tz") +
-    xlab("tx (cm)")+
-    scale_color_manual(values = color)+ labs(subtitle = "Tilapias")
-      theme_minimal() 
-
-      
+# # plot the trajectories  #tag:: can be deleted start
+# 
+# Divergence_df %>% filter(item == "W") %>% 
+#   filter(tx_pcent > 1 & tx_pcent < 80) %>% 
+#   filter(str_detect(string = particle, pattern = "C")) %>% 
+#   ggplot(aes(y=tz, x=tx_pcent)) +
+#   geom_line(aes(group=particle, color= item), size = 0.8) +
+#   geom_line(data = Divergence_df %>% filter(item == "F") %>% 
+#               filter(tx_pcent > 1 & tx_pcent < 80), 
+#             aes(group=particle, color= item), size = 0.8) +
+#   ylab("tz") +
+#   xlab("tx (cm)")+
+#   scale_color_manual(values = color)+ labs(subtitle = "Carps") 
+# 
+# Divergence_df %>% filter(item == "W") %>% 
+#   filter(tx_pcent > 20 & tx_pcent < 80) %>% 
+#   filter(str_detect(string = particle, pattern = "C", negate = TRUE)) %>% 
+#   ggplot(aes(y=tz, x=tx_pcent)) +
+#   geom_line(aes(group=particle, color= item), size = 0.8) +
+#   geom_line(data = Divergence_df %>% filter(item == "F") %>% 
+#               filter(tx_pcent > 20 & tx_pcent < 80), 
+#             aes(group=particle, color= item), size = 0.8) +
+#   ylab("tz") +
+#   xlab("tx (cm)")+
+#   scale_color_manual(values = color)+ labs(subtitle = "Tilapias")
+# 
+#        #tag:: can be deleted end
       
 ```
 
-### Food vs water path angle and curvature Visualisation
+<!-- ### Food vs water path angle and curvature Visualisation -->
 
-```{r , fig.width=5, fig.show='hold',fig.align='center'}
+<!-- ```{r , fig.width=5, fig.show='hold',fig.align='center'} -->
 
-color <- c(palette_IOFLOW[13], # grey
-           palette_IOFLOW[5]   # blue
-) 
+<!-- color <- c(palette_IOFLOW[13], # grey -->
+<!--            palette_IOFLOW[5]   # blue -->
+<!-- )  -->
 
-# plot of the Angle data 
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 80) %>% 
-ggplot(aes(y=-angle, x=tx_pcent)) +
- geom_line(aes(group=particle, color= item), size = 0.8) +
- geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 80), aes(group=particle, color= item), size = 0.8) +
-    ylab("angle (deg)") +
-    xlab("tx (cm)")+
-    scale_color_manual(values = color)+ labs(subtitle = "Angle")
+<!--  #tag:: can be deleted start -->
+<!-- # plot of the Angle data  -->
+<!-- Divergence_df %>% filter(item == "W") %>%  -->
+<!--   filter(tx_pcent > 1 & tx_pcent < 80) %>%  -->
+<!-- ggplot(aes(y=-angle, x=tx_pcent)) + -->
+<!--  geom_line(aes(group=particle, color= item), size = 0.8) + -->
+<!--  geom_line(data = Divergence_df %>% filter(item == "F") %>%  -->
+<!--              filter(tx_pcent > 1 & tx_pcent < 80), -->
+<!--            aes(group=particle, color= item), size = 0.8) + -->
+<!--     ylab("angle (deg)") + -->
+<!--     xlab("tx (cm)")+ -->
+<!--     scale_color_manual(values = color)+ labs(subtitle = "Angle") -->
 
 
-# plot of the curvature data
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 95) %>% 
-ggplot(aes(y=curvature, x=tx_pcent)) +
- geom_line(aes(group=particle, color= item), size = 0.8) +
- geom_line(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 100), aes(group=particle, color= item), size = 0.8) +
-    ylab("curvature (m-1)") +
-    xlab("tx (cm)")+
-  scale_color_manual(values = color)+ labs(subtitle = "Cuvature")
+<!-- # plot of the curvature data -->
+<!-- Divergence_df %>% filter(item == "W") %>% -->
+<!--   filter(tx_pcent > 1 & tx_pcent < 95) %>%  -->
+<!-- ggplot(aes(y=curvature, x=tx_pcent)) + -->
+<!--  geom_line(aes(group=particle, color= item), size = 0.8) + -->
+<!--  geom_line(data = Divergence_df %>% filter(item == "F") %>%  -->
+<!--              filter(tx_pcent > 1 & tx_pcent < 100),  -->
+<!--            aes(group=particle, color= item), size = 0.8) + -->
+<!--     ylab("curvature (m-1)") + -->
+<!--     xlab("tx (cm)")+ -->
+<!--   scale_color_manual(values = color)+ labs(subtitle = "Cuvature") -->
 
-      
+<!--        #tag:: can be deleted end -->
 
-```
-                               
+<!-- ``` -->
+
 ### Average of food and water tracer angle on a small span of tx
 
 #### Data preparation
 
 ```{r}
 
+# split between carps and tilapias
+Divergence_df_carps <-  Divergence_df %>% 
+  filter(str_detect(string = particle, pattern = "C"))
+  
+ Divergence_df_tilapias <-  Divergence_df %>% 
+   filter(str_detect(string = particle, pattern = "C", negate = TRUE)) 
+
+
+# Carps 
+ 
 # split between water and food particles
-Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
-Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+Divergence_df_water_carps <-  Divergence_df_carps %>% filter(item == "W") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food_carps <-  Divergence_df_carps %>% filter(item == "F") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+# %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
 
 # we cut by the number of intervals we want (5 intervals)
  
 breaks <- seq(from = 0, to = 75, by = 15)
 
 # water -----------------
-Curvature_interval_water <- Divergence_df_water %>% 
+Curvature_interval_water_carps <- Divergence_df_water_carps %>% 
     mutate(interval = cut(tx_pcent,
                           breaks, 
                           include.lowest = TRUE, 
                           right = FALSE)) %>% group_by(interval)
-Curvature_interval_water_mean <-  Curvature_interval_water %>%   summarise( mean.curvature = mean(curvature, na.rm=TRUE), sd.curvature = sd(curvature, na.rm=TRUE) )
+Curvature_interval_water_mean_carps <-  Curvature_interval_water_carps %>%  
+  summarise( mean.curvature = mean(curvature, na.rm=TRUE),
+             sd.curvature = sd(curvature, na.rm=TRUE) )
 
  # food -----------------
-Curvature_interval_food <- Divergence_df_food %>% 
+Curvature_interval_food_carps <- Divergence_df_food_carps %>% 
     mutate(interval = cut(tx_pcent,
                           breaks, 
                           include.lowest = TRUE, 
                           right = FALSE)) %>% group_by(interval) 
 
- Curvature_interval_food_mean <- Curvature_interval_food %>% summarise( mean.curvature = mean(curvature, na.rm=TRUE) , sd.curvature = sd(curvature, na.rm=TRUE) )
+ Curvature_interval_food_mean_carps <- Curvature_interval_food_carps %>% 
+   summarise( mean.curvature = mean(curvature, na.rm=TRUE) , 
+              sd.curvature = sd(curvature, na.rm=TRUE) )
 
  
 # merge water and food particles
- Curvature_interval<-  rbind(Curvature_interval_water, Curvature_interval_food) %>% arrange(desc(interval)) %>% 
+ Curvature_interval_carps<-  rbind(Curvature_interval_water_carps,
+                             Curvature_interval_food_carps) %>% 
+   arrange(desc(interval)) %>% 
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
-                             str_detect(string = particle, pattern = "A") ~ "F"))
+                           str_detect(string = particle, pattern = "A") ~ "F"))
+ 
+
 
 ```
 
+```{r}
+ # Tilapias 
+ 
+# split between water and food particles
+Divergence_df_water_tilapias <-  Divergence_df_tilapias %>% filter(item == "W") %>% 
+  filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food_tilapias <-  Divergence_df_tilapias %>% filter(item == "F") %>% 
+  filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+# %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+
+# we cut by the number of intervals we want (5 intervals)
+ 
+breaks <- seq(from = 15, to = 75, by = 15)
+
+# water -----------------
+Curvature_interval_water_tilapias <- Divergence_df_water_tilapias %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval)
+Curvature_interval_water_mean_tilapias <-  Curvature_interval_water_tilapias %>%  
+  summarise( mean.curvature = mean(curvature, na.rm=TRUE),
+             sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ # food -----------------
+Curvature_interval_food_tilapias <- Divergence_df_food_tilapias %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval) 
+
+ Curvature_interval_food_mean_tilapias <- Curvature_interval_food_tilapias %>% 
+   summarise( mean.curvature = mean(curvature, na.rm=TRUE) , 
+              sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ 
+# merge water and food particles
+ Curvature_interval_tilapias<-  rbind(Curvature_interval_water_tilapias,
+                             Curvature_interval_food_tilapias) %>% 
+   arrange(desc(interval)) %>% 
+ mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                           str_detect(string = particle, pattern = "A") ~ "F"))
+
+```
+
+
+
 #### Visualisation
-Now that we have the angle for intervals of tx for the water and the food items, we organize the data by Species and visualize the difference between each item (Figure 4 in the manuscript).
+Now that we have the angle for intervals of tx for the water and the food items, 
+we organize the data by Species and visualize the difference between each item 
+(Figure 4 in the manuscript).
 
 
 ##### Curvature
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
- # Either Carp of Tilapia:  
-    Species <- c("C", "T")
-    
-Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_interval, str_detect(string =  str_sub(string = particle, start = 4, end = 7 ), pattern = .)))) %>% set_names(Species)
- 
-   # plot the Carp data:
-  species <- "C"
-  
+  #Carp data:
   color <- c(palette_IOFLOW[13], # grey
              palette_IOFLOW[5]   # blue
   )
   
   
-  
-  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
+   ggplot(Curvature_interval_carps, aes(x=interval, y=curvature, 
+                                                    fill=item)) +
     geom_boxplot(notch=TRUE
                  , outlier.shape = NA
                  #, outlier.shape=8,  outlier.size=4
     ) +
     labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
     scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    scale_fill_manual(values =  color)+ labs(subtitle = "Carps" )+
     theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
+    stat_summary(fun=mean, geom="point", size=1, col = "white",
+                 position = position_dodge(0.75)) +
     theme(legend.position = "none") + 
     ylim(-0.5,2) 
 
     
-  # plot the Tilapia data:
-  species <- "T"
+
+```
+
+
+```{r}
+  # Tilapia data:
+  color <- c(palette_IOFLOW[13], # grey
+             palette_IOFLOW[5]   # blue
+  )
   
-  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
-    
-    geom_boxplot(notch=TRUE
+  
+   ggplot(Curvature_interval_tilapias, aes(x=interval, y=curvature, 
+                                                    fill=item)) +
+ 
+     geom_boxplot(notch=TRUE
                  , outlier.shape = NA
-                 # , outlier.shape=8,  outlier.size=4
+                 #, outlier.shape=8,  outlier.size=4
     ) +
     labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
     scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    scale_fill_manual(values =  color)+ labs(subtitle = "Tilapias" )+
     theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
-    theme(legend.position = "none")+   ylim(-0.5,2) 
-  
-  
+    stat_summary(fun=mean, geom="point", size=1, col = "white",
+                 position = position_dodge(0.75)) +
+    theme(legend.position = "none") + 
+    ylim(-0.5,2) 
+
 
 ```
 
@@ -1559,37 +1827,44 @@ We perform a t.test on each interval.
 
 ```{r}
 # Carps
-species <- "C"
-Intervals <- levels(Curvature_interval_species[[species]]$interval)
+Intervals <- levels(Curvature_interval_carps$interval)
 t_test_results_Carps <- map(.x = Intervals, 
                             .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          data = filter(.data = Curvature_interval_carps, interval== .), 
                                           alternative = "two.sided",
                                           mu = 0,
                                           paired = FALSE,
                                           var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
+                                          conf.level = 0.95))) %>% 
+  set_names(Intervals)
 
 t_test_p_value_Carps <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals)
+                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], 
+                                             group_name = "p.value")) %>%
+  set_names(Intervals)
 
 
 # Tilapias 
-species <- "T"
+Intervals <- levels(Curvature_interval_tilapias$interval)
 t_test_results_Tilapias <- map(.x = Intervals, 
                             .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          data = filter(.data = Curvature_interval_tilapias, interval== .),
                                           alternative = "two.sided",
                                           mu = 0,
                                           paired = FALSE,
                                           var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
+                                          conf.level = 0.95))) %>% 
+  set_names(Intervals)
 
 
 t_test_p_value_Tilapias <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
+                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]],
+                                             group_name = "p.value")) %>%
+  set_names(Intervals)
 
 ```
+
+
 
 #### Dorsoventral motions
 
@@ -1607,12 +1882,18 @@ for(trial in Trials){
       filter(WF_tx_pcent < 100) 
     
     if (nrow(Temp_particle) <= 1) {
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- NA
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- 
+    NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <-
+    NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <-
+    NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- 
+    NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- 
+    NA
+  Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- 
+    NA
       
   }
   else{
@@ -1621,18 +1902,26 @@ for(trial in Trials){
       B <- unlist(Temp_particle[j,1:3])
       C <- unlist(Temp_particle[(j+span),1:3]) 
 
-      A[3] <- 0 # we delete the y coordinate to calculate the divergence data in the dorsoventral view (medio-lateral)
+      A[3] <- 0 # we delete the z coordinate to calculate the divergence data in 
+      # the lateral view (dorso-ventral motins)
       B[3] <- 0
       C[3] <- 0
       
-      name <- str_replace(string = Particles[i], pattern =  "_data.tx", replacement = "" )
+      name <- str_replace(string = Particles[i], pattern =  "_data.tx", 
+                          replacement = "" )
     
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <- as.vector(compute_divergence(A,B,C)[1])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <- as.vector(compute_divergence(A,B,C)[2])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <- unlist(Temp_particle $ WF_tx_pcent[j])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <- unlist(Temp_particle[j,1])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <- unlist(Temp_particle[j,2])
-      Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <- unlist(Temp_particle[j,3]) 
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_angle")]][j] <-
+  as.vector(compute_divergence(A,B,C)[1])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_curvature")]][j] <-
+  as.vector(compute_divergence(A,B,C)[2])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx_pcent")]][j] <-
+  unlist(Temp_particle $ WF_tx_pcent[j])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tx")]][j] <-
+  unlist(Temp_particle[j,1])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_ty")]][j] <-
+  unlist(Temp_particle[j,2])
+Divergence[[names(Maya_WF)[trial]]][[name]][[paste0(name, "_tz")]][j] <-
+  unlist(Temp_particle[j,3]) 
         }
   }
   }
@@ -1645,24 +1934,38 @@ Divergence_clean[["T2P1T10"]] <- NULL
 
 ```
 
-We need to transform the Divergence list into a data.frame with the particle name, angle, curvature, tx, tx_pcent, and tz.  
+We need to transform the Divergence list into a data.frame with the particle
+name, angle, curvature, tx, tx_pcent, and tz.  
 
 
 ```{r}
 
-Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE), recursive = FALSE)
+Divergence_df_list <- unlist(unlist(Divergence_clean, recursive = FALSE),
+                             recursive = FALSE)
 
 # we divide between angle, tx, tx_pcent, and tz (same length):
-Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list), pattern = "angle"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_angle <- map(.x = str_which(string = names(Divergence_df_list),
+                                          pattern = "angle"), 
+                           .f = ~get_sublist(lst = Divergence_df_list, 
+                                  group_name = names(Divergence_df_list)[[.]]))
 
-Divergence_df_curvature <- map(.x = str_which(string = names(Divergence_df_list), pattern = "curvature"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_curvature <- map(.x = str_which(string = 
+                                                names(Divergence_df_list),
+                                              pattern = "curvature"), 
+                               .f = ~get_sublist(lst = Divergence_df_list, 
+                                  group_name = names(Divergence_df_list)[[.]]))
 
-Divergence_df_tx_pcent <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tx_pcent"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_tx_pcent <- map(.x = str_which(string = names(Divergence_df_list),
+                                             pattern = "_tx_pcent"),
+                              .f = ~get_sublist(lst = Divergence_df_list, 
+                                  group_name = names(Divergence_df_list)[[.]]))
 
-Divergence_df_tz <- map(.x = str_which(string = names(Divergence_df_list), pattern = "_tz"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
+Divergence_df_tz <- map(.x = str_which(string = names(Divergence_df_list),
+                                       pattern = "_tz"), .f = ~get_sublist(lst = Divergence_df_list, group_name = names(Divergence_df_list)[[.]]))
 
 
-Divergence_df <- data.frame(particle = str_sub(string = melt(Divergence_df_angle)[,2], 
+Divergence_df <- data.frame(particle = str_sub(string =
+                                                 melt(Divergence_df_angle)[,2], 
                          start = 21, 
                          end = (nchar(melt(Divergence_df_angle)[,2])-6)),
       angle = melt(Divergence_df_angle)[,1],
@@ -1671,8 +1974,9 @@ Divergence_df <- data.frame(particle = str_sub(string = melt(Divergence_df_angle
       tz= melt(Divergence_df_tz)[,1] )
 
 # we add a column with the item category:
-Divergence_df <- Divergence_df %>% mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
-                             str_detect(string = particle, pattern = "A") ~ "F"))
+Divergence_df <- Divergence_df %>%
+  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                          str_detect(string = particle, pattern = "A") ~ "F"))
    
 ```
 
@@ -1685,23 +1989,29 @@ color <- c(palette_IOFLOW[13], # grey
 ) 
 
 # plot of the Angle data 
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75) %>% 
+Divergence_df %>% filter(item == "W") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75) %>% 
 ggplot(aes(y=-angle, x=tx_pcent)) +
  geom_path(aes(group=particle, color= item), size = 0.8) +
- geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75), aes(group=particle, color= item), size = 0.8) +
+ geom_path(data = Divergence_df %>% filter(item == "F") %>%
+             filter(tx_pcent > 1 & tx_pcent < 75),
+           aes(group=particle, color= item), size = 0.8) +
     ylab("angle (deg)") +
     xlab("tx (cm)")+
-    scale_color_manual(values = color)+ labs(subtitle = "Angle")
+    scale_color_manual(values = color)+ labs(subtitle = "Angle")+
       theme_minimal() 
 
 # plot of the curvature data
-Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75) %>% 
+Divergence_df %>% filter(item == "W") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75) %>% 
 ggplot(aes(y=curvature, x=tx_pcent)) +
  geom_path(aes(group=particle, color= item), size = 0.8) +
- geom_path(data = Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75), aes(group=particle, color= item), size = 0.8) +
+ geom_path(data = Divergence_df %>% filter(item == "F") %>% 
+             filter(tx_pcent > 1 & tx_pcent < 75), 
+           aes(group=particle, color= item), size = 0.8) +
     ylab("tz (cm)") +
     xlab("tx (cm)")+
-  scale_color_manual(values = color)+ labs(subtitle = "Cuvature")
+  scale_color_manual(values = color)+ labs(subtitle = "Cuvature")+
       theme_minimal() 
       
 
@@ -1713,89 +2023,154 @@ ggplot(aes(y=curvature, x=tx_pcent)) +
 
 ```{r}
 
+# split between carps and tilapias
+Divergence_df_carps <-  Divergence_df %>% filter(str_detect(string = particle, pattern = "C"))
+  
+ Divergence_df_tilapias <-  Divergence_df %>% filter(str_detect(string = particle, pattern = "C", negate = TRUE)) 
+
+
+# Carps 
+ 
 # split between water and food particles
-Divergence_df_water <-  Divergence_df %>% filter(item == "W") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
-Divergence_df_food <-  Divergence_df %>% filter(item == "F") %>% filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) %>% filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+Divergence_df_water_carps <-  Divergence_df_carps %>% filter(item == "W") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food_carps <-  Divergence_df_carps %>% filter(item == "F") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+# %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
 
 # we cut by the number of intervals we want (5 intervals)
  
 breaks <- seq(from = 0, to = 75, by = 15)
 
 # water -----------------
-Curvature_interval_water <- Divergence_df_water %>% 
+Curvature_interval_water_carps <- Divergence_df_water_carps %>% 
     mutate(interval = cut(tx_pcent,
                           breaks, 
                           include.lowest = TRUE, 
                           right = FALSE)) %>% group_by(interval)
-Curvature_interval_water_mean <-  Curvature_interval_water %>%   summarise( mean.curvature = mean(curvature, na.rm=TRUE), sd.curvature = sd(curvature, na.rm=TRUE) )
+Curvature_interval_water_mean_carps <-  Curvature_interval_water_carps %>%  
+  summarise( mean.curvature = mean(curvature, na.rm=TRUE),
+             sd.curvature = sd(curvature, na.rm=TRUE) )
 
  # food -----------------
-Curvature_interval_food <- Divergence_df_food %>% 
+Curvature_interval_food_carps <- Divergence_df_food_carps %>% 
     mutate(interval = cut(tx_pcent,
                           breaks, 
                           include.lowest = TRUE, 
                           right = FALSE)) %>% group_by(interval) 
 
- Curvature_interval_food_mean <- Curvature_interval_food %>% summarise( mean.curvature = mean(curvature, na.rm=TRUE) , sd.curvature = sd(curvature, na.rm=TRUE) )
+ Curvature_interval_food_mean_carps <- Curvature_interval_food_carps %>% 
+   summarise( mean.curvature = mean(curvature, na.rm=TRUE) , 
+              sd.curvature = sd(curvature, na.rm=TRUE) )
 
  
 # merge water and food particles
- Curvature_interval<-  rbind(Curvature_interval_water, Curvature_interval_food) %>% arrange(desc(interval)) %>% 
+ Curvature_interval_carps<-  rbind(Curvature_interval_water_carps,
+                             Curvature_interval_food_carps) %>% 
+   arrange(desc(interval)) %>% 
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
-                             str_detect(string = particle, pattern = "A") ~ "F"))
+                           str_detect(string = particle, pattern = "A") ~ "F"))
+ 
+ 
+ 
+ # tilapias 
+ 
+# split between water and food particles
+Divergence_df_water_tilapias <-  Divergence_df_tilapias %>% filter(item == "W") %>% 
+  filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_food_tilapias <-  Divergence_df_tilapias %>% filter(item == "F") %>% 
+  filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+# %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
+
+# we cut by the number of intervals we want (5 intervals)
+ 
+breaks <- seq(from = 15, to = 75, by = 15)
+
+# water -----------------
+Curvature_interval_water_tilapias <- Divergence_df_water_tilapias %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval)
+Curvature_interval_water_mean_tilapias <-  Curvature_interval_water_tilapias %>%  
+  summarise( mean.curvature = mean(curvature, na.rm=TRUE),
+             sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ # food -----------------
+Curvature_interval_food_tilapias <- Divergence_df_food_tilapias %>% 
+    mutate(interval = cut(tx_pcent,
+                          breaks, 
+                          include.lowest = TRUE, 
+                          right = FALSE)) %>% group_by(interval) 
+
+ Curvature_interval_food_mean_tilapias <- Curvature_interval_food_tilapias %>% 
+   summarise( mean.curvature = mean(curvature, na.rm=TRUE) , 
+              sd.curvature = sd(curvature, na.rm=TRUE) )
+
+ 
+# merge water and food particles
+ Curvature_interval_tilapias<-  rbind(Curvature_interval_water_tilapias,
+                             Curvature_interval_food_tilapias) %>% 
+   arrange(desc(interval)) %>% 
+ mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
+                           str_detect(string = particle, pattern = "A") ~ "F"))
+
 
 ```
 
 #### Visualisation
-Now that we have the angle for intervals of tx for the water and the food items, we organize the data by Species and visualize the difference between each item (Figure 4 in the manuscript).
+Now that we have the angle for intervals of tx for the water and the food items,
+we organize the data by Species and visualize the difference between each item 
+(Figure 4 in the manuscript).
 
 
 ##### Curvature
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
- # Either Carp of Tilapia:  
-    Species <- c("C", "T")
-    
-Curvature_interval_species <- map(.x = Species, .f = ~(filter(.data = Curvature_interval, str_detect(string =  str_sub(string = particle, start = 4, end = 7 ), pattern = .)))) %>% set_names(Species)
- 
-   # plot the Carp data:
-  species <- "C"
-  
+ #Carp data:
   color <- c(palette_IOFLOW[13], # grey
              palette_IOFLOW[5]   # blue
   )
   
   
-  
-  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
+   ggplot(Curvature_interval_carps, aes(x=interval, y=curvature, 
+                                                    fill=item)) +
     geom_boxplot(notch=TRUE
                  , outlier.shape = NA
                  #, outlier.shape=8,  outlier.size=4
     ) +
     labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
     scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    scale_fill_manual(values =  color)+ labs(subtitle = "Carps" )+
     theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
+    stat_summary(fun=mean, geom="point", size=1, col = "white",
+                 position = position_dodge(0.75)) +
     theme(legend.position = "none") + 
-    ylim(-0.5,5) 
+    ylim(-0.5,2) 
 
     
-  # plot the Tilapia data:
-  species <- "T"
+  # Tilapia data:
+  color <- c(palette_IOFLOW[13], # grey
+             palette_IOFLOW[5]   # blue
+  )
   
-  ggplot(Curvature_interval_species[[species]], aes(x=interval, y=curvature, fill=item)) +
-    
-    geom_boxplot(notch=TRUE
+  
+   ggplot(Curvature_interval_tilapias, aes(x=interval, y=curvature, 
+                                                    fill=item)) +
+ 
+     geom_boxplot(notch=TRUE
                  , outlier.shape = NA
-                 # , outlier.shape=8,  outlier.size=4
+                 #, outlier.shape=8,  outlier.size=4
     ) +
     labs(x="percentage of tx", y = expression(curvature~(m^-1))) + 
     scale_color_manual(values = color)+
-    scale_fill_manual(values =  color)+ labs(subtitle = species )+
+    scale_fill_manual(values =  color)+ labs(subtitle = "Tilapias" )+
     theme_minimal() +
-    stat_summary(fun=mean, geom="point", size=1, col = "white", position = position_dodge(0.75)) +
-    theme(legend.position = "none")+   ylim(-0.5,5) 
+    stat_summary(fun=mean, geom="point", size=1, col = "white",
+                 position = position_dodge(0.75)) +
+    theme(legend.position = "none") + 
+    ylim(-0.5,2) 
+
   
   
 
@@ -1808,36 +2183,40 @@ We perform a t.test on each interval.
 
 ```{r}
 # Carps
-species <- "C"
-Intervals <-levels(Curvature_interval_species[[species]]$interval)
+Intervals <- levels(Curvature_interval_carps$interval)
 t_test_results_Carps <- map(.x = Intervals, 
                             .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          data = filter(.data = Curvature_interval_carps, interval== .), 
                                           alternative = "two.sided",
                                           mu = 0,
                                           paired = FALSE,
                                           var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
-
+                                          conf.level = 0.95))) %>% 
+  set_names(Intervals)
 
 t_test_p_value_Carps_dv <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], group_name = "p.value")) %>% set_names(Intervals)
+                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], 
+                                             group_name = "p.value")) %>%
+  set_names(Intervals)
 
 
 # Tilapias 
-species <- "T"
+Intervals <- levels(Curvature_interval_tilapias$interval)
 t_test_results_Tilapias <- map(.x = Intervals, 
                             .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_species[[species]], interval== .),
+                                          data = filter(.data = Curvature_interval_tilapias, interval== .),
                                           alternative = "two.sided",
                                           mu = 0,
                                           paired = FALSE,
                                           var.equal = TRUE,
-                                          conf.level = 0.95))) %>% set_names(Intervals)
+                                          conf.level = 0.95))) %>% 
+  set_names(Intervals)
 
 
 t_test_p_value_Tilapias_dv <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]], group_name = "p.value")) %>% set_names(Intervals)
+                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]],
+                                             group_name = "p.value")) %>%
+  set_names(Intervals)
 
 ```
 
@@ -1847,14 +2226,15 @@ t_test_p_value_Tilapias_dv <-map(.x = Intervals,
 
 We want to visualise on the same plot
 - Food tx
-- Gape (open close) -> distance inferior vs posterior
-- Hyoid dorsoventral -> tip of hyoid relative to pharyngeal jaw (ty)
-- Ope opening/closing -> tip of ope relative to pharyngeal jaw (tz): eloignement de midsagittal
+- Gape (open close) : distance inferior vs posterior
+- Hyoid dorsoventral : tip of hyoid relative to pharyngeal jaw (ty)
+- Ope opening/closing : tip of ope relative to pharyngeal jaw (tz)
 
 
 ## Building Kdata
 
-We want to combine KData (the kinematics data) and MayaData (the tracer trajectory data) and add Time, Frame, Phase.
+We want to combine KData (the kinematics data) and MayaData (the tracer 
+trajectory data) and add Time, Frame, Phase.
 
 
 ```{r}
@@ -1891,7 +2271,8 @@ KData <- mapply(FUN = c, Time, Food, Water, Maya_Loc, SIMPLIFY=FALSE)
 
 ```
 
-We calculate the Gape, using the locators placed on the tip of the lower and upper jaws.
+We calculate the Gape, using the locators placed on the tip of the lower and 
+upper jaws.
 
 ```{r}
 
@@ -1910,8 +2291,12 @@ Jaws <- map(.x = Trials[1:10],
 Gape <- map(.x = Trials[1:10],
             .f = ~ (as.data.frame(cbind(
               Gape = distance(
-                df1 = select(Jaws[[.]], names(Jaws[[.]])[contains(match = "lower_jaw", vars = names(Jaws[[.]]))]),
-                df2 = select(Jaws[[.]], names(Jaws[[.]])[contains(match = "upper_jaw", vars = names(Jaws[[.]]))])))))) %>%
+                df1 = select(Jaws[[.]], 
+                             names(Jaws[[.]])[contains(match = "lower_jaw", 
+                                                       vars = names(Jaws[[.]]))]),
+                df2 = select(Jaws[[.]], 
+                             names(Jaws[[.]])[contains(match = "upper_jaw",
+                                                       vars = names(Jaws[[.]]))])))))) %>%
   set_names(names(Maya_Loc))
 
 # merging the data:
@@ -1925,7 +2310,9 @@ KData <- mapply(FUN = c, KData,  Gape, SIMPLIFY=FALSE)
 
 ##### Carps
 
-We plot the suction feeding sequence of trial C2P1T04 of carp to visualize the kinematics of Gape, Hyoid depression and Opercula opening relative to the water motions.
+We plot the suction feeding sequence of trial C2P1T04 of carp to visualize 
+the kinematics of Gape, Hyoid depression and Opercula opening relative to the
+water motions.
 
 
 ```{r}
@@ -1970,7 +2357,7 @@ plot.Tx_water <- ggplot(data = d,
 KData_df <- as.data.frame(KData[[trial]])
 KData_df <- KData_df[subtime,]
 
-KData_Gape <-  ggplot(KData_df, aes(x = Time, y = Gape, colour="#808080")) + #, group="Particles"
+KData_Gape <-  ggplot(KData_df, aes(x = Time, y = Gape, colour="#808080")) +
   geom_line(aes(group=1), size=size)+
   ylab("") +
   xlab("") +
@@ -1987,7 +2374,10 @@ KData_Gape <-  ggplot(KData_df, aes(x = Time, y = Gape, colour="#808080")) + #, 
 
 ## Hyoid
 
-KData_Hyoid <-  ggplot(KData_df, aes(x = Time, y = -BonesLocators_relative.hyoid_tip_data.ty, colour="#808080")) + 
+KData_Hyoid <-  ggplot(KData_df,
+                       aes(x = Time,
+                           y = -BonesLocators_relative.hyoid_tip_data.ty,
+                           colour="#808080")) + 
   geom_line(aes(group=1), size=size)+
   ylab("") + 
   labs(subtitle = "Hyoid depression (cm)")+
@@ -2004,7 +2394,9 @@ KData_Hyoid <-  ggplot(KData_df, aes(x = Time, y = -BonesLocators_relative.hyoid
 
 ## Ope
 
-KData_Ope <-  ggplot(KData_df, aes(x = Time, y = BonesLocators_relative.ope_tip_data.tz, colour="#808080")) + #, group="Particles"
+KData_Ope <-  ggplot(KData_df, 
+                     aes(x = Time, y = BonesLocators_relative.ope_tip_data.tz,
+                         colour="#808080")) + #, group="Particles"
   geom_line(aes(group=1), size=size)+
   ylab("") + 
   labs(subtitle = "Opercula abduction (cm)")+
@@ -2027,7 +2419,9 @@ G1 <- rbind(ggplotGrob(plot.Tx_water),
 
 ##### Tilapias
 
-We plot the suction feeding sequence of trial T1P1T06 of tilapia to visualize the kinematics of Gape, Hyoid depression and Opercula opening relative to the water motions.
+We plot the suction feeding sequence of trial T1P1T06 of tilapia to visualize 
+the kinematics of Gape, Hyoid depression and Opercula opening relative to the 
+water motions.
 
 
 
@@ -2069,7 +2463,8 @@ plot.Tx_water <- ggplot(data = d,
 KData_df <- as.data.frame(KData[[trial]])
 KData_df <- KData_df[subtime,]
 
-KData_Gape <-  ggplot(KData_df, aes(x = Time, y = Gape, colour="#808080")) + #, group="Particles"
+KData_Gape <-  ggplot(KData_df,
+                      aes(x = Time, y = Gape, colour="#808080")) +
   geom_line(aes(group=1), size=size)+
   ylab("") + 
   labs(subtitle = "Gape (cm)")+
@@ -2083,7 +2478,10 @@ KData_Gape <-  ggplot(KData_df, aes(x = Time, y = Gape, colour="#808080")) + #, 
   scale_fill_manual(values =  color)
 
 ## Hyoid
-KData_Hyoid <-  ggplot(KData_df, aes(x = Time, y = -BonesLocators_relative.hyoid_tip_data.ty, color="#808080")) + 
+KData_Hyoid <-  ggplot(KData_df,
+                       aes(x = Time, 
+                           y = -BonesLocators_relative.hyoid_tip_data.ty,
+                           color="#808080")) + 
   geom_line(aes(group=1), size=size)+
   labs(subtitle = "Hyoid depression (cm)")+
   ylab("") +
@@ -2097,7 +2495,10 @@ KData_Hyoid <-  ggplot(KData_df, aes(x = Time, y = -BonesLocators_relative.hyoid
   scale_fill_manual(values = color) 
 
 ## Ope
-KData_Ope <-  ggplot(KData_df, aes(x = Time, y = -BonesLocators_relative.ope_tip_data.tz, colour="#808080")) +     geom_line(aes(group=1), size=size)+
+KData_Ope <-  ggplot(KData_df, aes(x = Time, 
+                                   y = -BonesLocators_relative.ope_tip_data.tz,
+                                   colour="#808080")) +   
+  geom_line(aes(group=1), size=size)+
    ylab("") + 
   labs(subtitle = "Opercula abduction (cm)")+
   xlim(xlim_inf,xlim_sup)+
@@ -2120,9 +2521,6 @@ G2 <- rbind(ggplotGrob(plot.Tx_water),
 We combine the plots to create Figure 5 of the manuscript
 
 ```{r, fig.width= 7, fig.show='hold',fig.align='center'}
-
-
-# Plots
 
 grid.newpage()
 

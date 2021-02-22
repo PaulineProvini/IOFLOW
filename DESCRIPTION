@@ -1,7 +1,7 @@
 Package: IOFLOW
 Type: Package
 Title: IOFLOW
-Version: 0.0.1
+Version: 0.0.2
 Author: Pauline Provini
 Maintainer: Pauline Provini <pauline.provini@gmail.com>
 Description: Package for generating and analysing the IOFLOW data. Produce the figures, tables and processed data presented in the manuscript.
