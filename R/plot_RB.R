@@ -17,7 +17,7 @@ plot_RB <- function(trial, RB_name, component=c("tx", "ty", "tz", "rx", "ry", "r
   if (component=="rz"){ column = 6}
   ggplot(data = Phase[[trial]],
          aes(
-           x = Timing[[trial]]$time,
+           x = Timing[[trial]]$timing,
            y = RB[[trial]][[RB_name]][,column])) +
     geom_point(aes(colour = phase), size = 1) +
     ylab(paste(RB_name,component, sep=' ')) +

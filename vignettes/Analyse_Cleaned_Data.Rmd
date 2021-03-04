@@ -58,9 +58,9 @@ devtools::load_all()
 
 There are three main datasets coming from the **IOFLOW package**:
 
- - Tracking data for density test of 19 water tracers.  
- - Water and Food tracers data, refered to with "*WF*" suffix or prefix.  
- - Rigid body data, refered to with "*RB*" suffix or prefix.    
+ 1. Tracking data for density test of 19 water tracers.  
+ 2. Water and Food tracers data, refered to with "*WF*" suffix or prefix.  
+ 3. Rigid body data, refered to with "*RB*" suffix or prefix.    
 
 The following script is based on functions we can call for a given trial or for 
 all of them. For the waterflow analysis, there are: 
@@ -69,7 +69,8 @@ all of them. For the waterflow analysis, there are:
  - 6 sequences of Tilapia  
  
 # Water tracers density test
-## Design of water tracers
+
+### Design of water tracers
 The water tracer had to fulfil two apparently contradictory requirements: 
 1) being radio-opaque to be trackable on the x-ray videos  
 2) being neutrally buoyant to passively follow the water trajectory. 
@@ -78,7 +79,7 @@ spheres (expanded polystyrene). We cut the nickel rod on both sides of each foam
 spheres to obtain the water tracers. The lightness of the foam counterbalanced 
 the weight of the inserted nickel. 
 
-## Test of water tracer density
+### Test of water tracer density
 We dropped 19 water tracers in the middle of a water column, filmed and 
 extracted their trajectory, using ProAnalyst software (XCitex, Cambridge, MA, 
 USA).  
@@ -217,11 +218,13 @@ of water and used them in the experiment.
 
 We plot the trajectory and velocity of the food (one item) with the mean and 
 standard deviation of the water tracers over time by calling the plot_mean 
-function. These plots correspond to the Figure 2 in the manuscript. 
+function. 
+These plots correspond to the Figure 2 in the manuscript. 
 
 ### Example of C2P1T04 (Carp 2, one food item, trial 4):
 
 ```{r Figure2_carp, echo=TRUE, message=FALSE, warning=FALSE, fig.width=5, fig.show='hold',fig.align='center'}
+
 # FIGURE 2  Full Sequence: TRAJECTORY and VELOCITY 
 
 # C2P1T04: trial 4 of carp 2 (one prey)
@@ -231,18 +234,18 @@ color <- c(palette_IOFLOW[13], # grey
 ) 
 
 # Tx plot
-# xlab <- ""
+xlab <- ""
 ylab <- "x-position (cm)"
 d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), 
-           time = Timing[[trial]]$time)
-plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, 
+           timing = Timing[[trial]]$timing)
+plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab = xlab,
                              color = color) + theme(plot.margin = unit(c(0,0,0,0), "lines"))
 
 # Vx plot
 xlab <- "time (s)"
 ylab <- "x-velocity (cm/s)"
 d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), 
-           time = Timing[[trial]]$time)
+           timing = Timing[[trial]]$timing)
 
 plot.Vx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, 
                              color = color) + theme(plot.margin = unit(c(0,0,0,0), "lines"))
@@ -250,7 +253,7 @@ plot.Vx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab,
 
 # plot the combination of the two plots
 
-ggarrange(plot.Tx_C2P1T04+ rremove("x.text") + rremove(object = "xlab") , plot.Vx_C2P1T04, 
+ggarrange(plot.Tx_C2P1T04+ rremove("x.text") + rremove(object = "xlab") , plot.Vx_C2P1T04, labels = "Fig 2a. Carp",
          ncol = 1, nrow = 2, align = "v")
 
 
@@ -272,7 +275,7 @@ color <- c(palette_IOFLOW[13], # grey
 # xlab <- ""
 ylab <- "x-position (cm)"
 d <- cbind(rbind(Mean_tx_W[[trial]],Mean_tx_F[[trial]]), 
-           time = Timing[[trial]]$time)
+           timing = Timing[[trial]]$timing)
 
 plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color)+ 
   theme(plot.margin = unit(c(0,0,0,0), "lines"))
@@ -281,7 +284,7 @@ plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color)+
 xlab <- "time (s)"
 ylab <- "x-velocity (cm/s)"
 d <- cbind(rbind(Mean_vx_W[[trial]],Mean_vx_F[[trial]]), 
-           time = Timing[[trial]]$time)
+           timing = Timing[[trial]]$timing)
 
 plot.Vx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color) + 
   theme(plot.margin = unit(c(0,0,0,0), "lines"))
@@ -289,23 +292,24 @@ plot.Vx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, color = color) +
 
 # plot the combination of the two plots
 
-ggarrange(plot.Tx_T1P1T06+ rremove("x.text") + rremove(object = "xlab") , plot.Vx_T1P1T06, 
+ggarrange(plot.Tx_T1P1T06+ rremove("x.text") + rremove(object = "xlab") , plot.Vx_T1P1T06, labels = "Fig 2b. Tilapia",
          ncol = 1, nrow = 2, align = "v")
 
 
 ```
 
+
 ## Distance covered by Food vs Water tracers
 
-We calculate the iterative distance covered by the water and food tracers 
+We want to calculate the total distance covered by the water and food tracers 
 (**WF**) at each frame, over a sequence of suction feeding. 
-We store this in a list we named **Distance_WF**.
+First, we store the iterative distance in a list we name **Distance_WF**.
 
 ```{r iterative_distance, echo=TRUE, message=FALSE, warning=FALSE}
 
 # Calculate the iterative distance of all tracers for each frame
 Distance_WF <-
-  map(.x = Trials, .f = ~ sqrt((WF_tx[[.]][] - lag(WF_tx[[.]][])) ^ 2 +
+  map(.x = Trials, .f = ~ sqrt((  WF_tx[[.]][] - lag(WF_tx[[.]][])) ^2 +
                                  (WF_ty[[.]][] - lag(WF_ty[[.]][])) ^2 +
                                  (WF_tz[[.]][] - lag(WF_tz[[.]][])) ^2)) %>%
   set_names(names(WF_tx))
@@ -327,8 +331,7 @@ Distance_WF <- mapply(FUN = data.frame,
 
 ### Total distance for each tracer, cumulated on the entire sequence
 
-We calculate the total distance covered by each tracer over the entire sequence,
-by summing the previously computed iterative distances. We name this 
+Now, we can calculate the total distance covered by each tracer over the entire sequence, by summing the previously computed iterative distances. We name this 
 variable **Sum_dist_WF**.
 
 ```{r cumulative_distance, echo=TRUE, message=FALSE, warning=FALSE}
@@ -343,38 +346,42 @@ Sum_dist_WF <-
 ```
 
 
-### Average of the Total distance cumulated on the entire sequence
+#### Average of the Total distance cumulated on the entire sequence
 
 We compute the mean and standard deviation of the cumulative distance 
 **Sum_dist_WF** for each species and each type of tracer (food and water).   
 For the water tracers, the cumulative distance is averaged over all the water 
-tracers of the trial. As there was one to three markers implanted in one food 
+tracers of the trial.   
+As there was one to three markers implanted in one food 
 item, the standard deviation for the food tracers is low or corresponds to a
 NA when only one marker remained.
+We use the compute_species_item function to compute the mean and standard
+deviation of the cumulative distance for each species and each type of tracer.
+
 
 ```{r compute_species_item, echo=TRUE, message=FALSE, warning=FALSE}
 
-
+# Food tracers
 Food <- map(.x = Trials, .f= ~select( Sum_dist_WF[[.]],
         names(Sum_dist_WF[[.]])[contains(match = "A",
                                          vars = names(Sum_dist_WF[[.]]))])
 ) %>% set_names(names(Maya_WF))
 
+Carps_food     <- compute_species_item(species = "carp",
+                       item = "food",
+                       name = "Carps_food")
+
+Tilapias_food  <- compute_species_item(species = "tilapia",
+                       item = "food",
+                       name = "Tilapias_food")
+
+
+# Water tracers
+
 Water <- map(.x = Trials, .f= ~select( Sum_dist_WF[[.]],
         names(Sum_dist_WF[[.]])[contains(match = "A",
                                          vars = names(Sum_dist_WF[[.]]))])
 ) %>% set_names(names(Maya_WF))
-
-
-
-
-
-Carps_food     <- compute_species_item(species = "carp",
-                       item = "food",
-                       name = "Carps_food")
-Tilapias_food  <- compute_species_item(species = "tilapia",
-                       item = "food",
-                       name = "Tilapias_food")
 
 Carps_water    <- compute_species_item(species = "carp",
                        item = "water",
@@ -387,8 +394,8 @@ Tilapias_water <-compute_species_item(species = "tilapia",
 
 ```
 
-For example, **Carps_food** is a list with the mean and standard deviation of 
-the cumulative distance of each trial for the food item
+For example, we obtain **Carps_food**, which is a list with the mean and 
+standard deviation of the cumulative distance of each trial for the food item.
 
 ```{r Carps_food, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -420,7 +427,7 @@ glimpse(Carps_distance[1])
 
 ```
 
-### Table with distance cumulated on the entire sequence 
+#### Table with distance cumulated on the entire sequence 
 
 We build a table with all the important information about the cumulative 
 distance of food and water tracers.
@@ -476,9 +483,8 @@ kable_styling()
 
 ```
 
-These data correspond to the Table 1 in the manuscript.
 
-### Histogram of the total distance covered by food and water tracers
+#### Histogram of the total distance covered by food and water tracers
 
 We use the previous table to plot an histogramm with the relevant variables. 
 This histogram corresponds to a visualisation of Table 1.
@@ -520,8 +526,9 @@ tilapia_bar
 
 ```
 
-The food tracers don't have any standard deviation bars because all the markers
-were on the same food item.
+These histograms correspond to Fig. S2 in the manuscript. 
+Note that the food tracers don't have any standard deviation bars because all 
+the food markers were on the same food item.
 
 
 
@@ -531,6 +538,7 @@ To automatically detect the different phases during a trial, we use a
 combination of information about the water tracers velocity and trajectory.
 We focus on the water tracers to determine the different phases.
 
+### Data preparation
 
 ```{r Phase, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -556,7 +564,7 @@ Mean_v_t_W <-  mapply(
   frame = Frame,
   SIMPLIFY = FALSE)
 
-# compute the differences at each row of Mean_v_t_W to obtain a trend (+ or -) 
+# compute the lag between each row of Mean_v_t_W to obtain a trend (+ or -) 
 #and add it to Mean_v_t_W
 
 Phase <- map(.x = Trials,
@@ -565,8 +573,15 @@ Phase <- map(.x = Trials,
                mutate(diff_average_tx = average_tx - lag(average_tx))) %>%
   set_names(names(Mean_v_t_W))
 
-# compute a label (stasis, reverse flow, transport) associated with a given 
-#combination of value for average_vx, and diff_average_vx
+
+```
+
+### Phases extraction 
+
+We assign a label ("stasis", "reverse flow", "transport") associated with a given 
+combination of value for average_vx, and diff_average_vx.
+
+```{r}
 
 Phase <-  map(.x = Trials,
               .f = ~ mutate(.data = Phase[[.]],
@@ -592,9 +607,10 @@ phase <-  map(.x = Trials,
 ```
 
 
-### Test for the phase extraction
+### Test  the phase extraction on one trial
 
-We test the phase detection on the different trials. Here we chose "C2P1T04".
+We test the phase detection on the different trials. 
+Here we chose "C2P1T04" that we used in Figure 2a.
 
 ```{r Phases, echo=TRUE, message=FALSE, warning=FALSE, fig.width=5, fig.show='hold',fig.align='center'}
 
@@ -604,7 +620,7 @@ trial <- "C2P1T04"
 # Plot of the velocity trend (+ or -) over the trial
 
 plot.Velocity_trend <- ggplot(data = Phase[[trial]],
-                              aes(x = Timing[[trial]]$time,
+                              aes(x = Timing[[trial]]$timing,
                                   y =  diff_average_vx)) +
   geom_hline(yintercept = 0.35) +
   geom_hline(yintercept = -0.35) +
@@ -617,12 +633,12 @@ plot.Velocity_trend <- ggplot(data = Phase[[trial]],
     name = "phase"
   ) +
   scale_fill_manual(values =  palette_IOFLOW) +
-  labs(title = "Test Phase Detection") +
+  labs(title = "Test Phase Detection C2P1T04") +
   theme_minimal()
 
 
 plot.Velocity_mean <- ggplot(data = Phase[[trial]],
-                             aes(x = Timing[[trial]]$time,
+                             aes(x = Timing[[trial]]$timing,
                                  y = average_vx)) +
   geom_point(aes(colour = as.factor(phase)), size = 1) +
   ylab("vx") +
@@ -639,7 +655,7 @@ plot.Velocity_mean <- ggplot(data = Phase[[trial]],
 
 
 plot.TrajectoryX_mean <- ggplot(data = Phase[[trial]],
-                                aes(x = Timing[[trial]]$time,
+                                aes(x = Timing[[trial]]$timing,
                                     y = average_tx)) +
   geom_point(aes(colour = as.factor(phase)), size = 1) +
   ylab("tx") +
@@ -657,17 +673,18 @@ plot.Velocity_trend
 plot.Velocity_mean
 plot.TrajectoryX_mean
 
-# theme(legend.position = "none")
+```
 
+We also test the phase extraction on "T1P1T06", used in Fig. 2b.
 
-
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=5, fig.show='hold',fig.align='center'}
 # Tested trial
 trial <- "T1P1T06"
 
 # Plot of the velocity trend (+ or -) over the trial
 
 plot.Velocity_trend <- ggplot(data = Phase[[trial]],
-                              aes(x = Timing[[trial]]$time,
+                              aes(x = Timing[[trial]]$timing,
                                   y =  diff_average_vx)) +
   geom_hline(yintercept = 0.35) +
   geom_hline(yintercept = -0.35) +
@@ -680,12 +697,12 @@ plot.Velocity_trend <- ggplot(data = Phase[[trial]],
     name = "phase"
   ) +
   scale_fill_manual(values =  palette_IOFLOW) +
-  labs(title = "Test Phase Detection") +
+  labs(title = "Test Phase Detection 'T1P1T06'") +
   theme_minimal()
 
 
 plot.Velocity_mean <- ggplot(data = Phase[[trial]],
-                             aes(x = Timing[[trial]]$time,
+                             aes(x = Timing[[trial]]$timing,
                                  y = average_vx)) +
   geom_point(aes(colour = as.factor(phase)), size = 1) +
   ylab("vx") +
@@ -702,7 +719,7 @@ plot.Velocity_mean <- ggplot(data = Phase[[trial]],
 
 
 plot.TrajectoryX_mean <- ggplot(data = Phase[[trial]],
-                                aes(x = Timing[[trial]]$time,
+                                aes(x = Timing[[trial]]$timing,
                                     y = average_tx)) +
   geom_point(aes(colour = as.factor(phase)), size = 1) +
   ylab("tx") +
@@ -713,15 +730,15 @@ plot.TrajectoryX_mean <- ggplot(data = Phase[[trial]],
     name = "phase"
   ) +
   scale_fill_manual(values =  palette_IOFLOW) +  
-  theme_minimal() +theme(legend.position = "none")
+  theme_minimal() 
 
 
 plot.Velocity_trend
 plot.Velocity_mean
 plot.TrajectoryX_mean
 
-
 ```
+
 
 ### Periodicity of the phases
 
@@ -738,6 +755,7 @@ peaks <-  map(.x = Trials,
 
 
 ```
+
 We want to extract the duration between each transition reverse/back flow:
 
 ```{r}
@@ -778,11 +796,14 @@ To describe the waterflow over time, we need to compute several values,
 including maximum velocity amplitudes for the different phases in both carps 
 and tilapias.
 
-#### First strike
 
-We use the minimum and maximum of the **average_VX** data to obtain the maximum amplitude 
-of the water tracers motion during the first strike. The X axis is pointing 
-toward the back of the buccal cavity.
+### Data preparation
+
+We store in **Data_W_F** the mean and standard deviation of:     
+- x, y, and z trajectories    
+- x, y, and z velocities  
+for all the food and water tracers over each trial.
+
 
 ```{r FirstStrike_magnitude, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -841,22 +862,38 @@ Data_W_F <- mapply(FUN = data.frame, Timing, phase,
              ~set_names(x=Mean_vz_F[[.]][3],nm = rep("sd_VZ_food", length(.)))), SIMPLIFY = FALSE) %>%
   set_names(names(Timing))
 
+```
+
+### First strike
+
+Then, we store:  
+- initial value of the average_vX, at the beginning of the sequence   
+- minimum of average_vX 
+- maximum of average_vX 
+
+to calculate:   
+- anteroposterior velocity at the beginning of the sequence in a given species
+for the water (W) and the food (F) 
+- peak of anteroposterior velocity during the first strike in each 
+- peak of anteroposterior velocity during the rest of the sequence in each 
+species   
 
 
+```{r}
 # Compute the initial value of the average_vX, at the beginning of the sequence
 Vx_FS_init_W <-  map_dbl(.x = Trials, 
                   .f = ~(Data_W_F[[.]]$average_VX[5]))
 Vx_FS_init_F <-  map_dbl(.x = Trials, 
                   .f = ~(Data_W_F[[.]]$average_VX_food[5]))
 
-# Compute the minimum of average_vX during the first strike
+# Compute the minimum of average_vX
 Vx_FS_min_W <-  map_dbl(.x = Trials, 
                   .f = ~ (min(Data_W_F[[.]]$average_VX, na.rm = TRUE)))
 Vx_FS_min_F <-  map_dbl(.x = Trials, 
                   .f = ~ (min(Data_W_F[[.]]$average_VX_food, na.rm = TRUE)))
 
 
-# Compute the maximum of average_vX during the entire sequence
+# Compute the maximum of average_vX 
 Vx_FS_max_W <-  map_dbl(.x = Trials, 
                   .f = ~ (max(Data_W_F[[.]]$average_VX, na.rm = TRUE)))
 
@@ -864,7 +901,8 @@ Vx_FS_max_F <-  map_dbl(.x = Trials,
                   .f = ~ (max(Data_W_F[[.]]$average_VX_food, na.rm = TRUE)))
 
 
-# Compute the anteroposterior velocity at the beginning of the sequence in a given species for the water (W) and the food (F):
+# Compute the anteroposterior velocity at the beginning of the 
+#sequence for each species and each item (W and F):
 
 ## carps
 Vx_FS_init_Carps_mean_W <- mean(Vx_FS_init_W[1:7])
@@ -881,7 +919,8 @@ Vx_FS_init_Tilapias_sd_W<- sd(Vx_FS_init_W[8:13])
 Vx_FS_init_Tilapias_mean_F <- mean(Vx_FS_init_F[8:13])
 Vx_FS_init_Tilapias_sd_F<- sd(Vx_FS_init_F[8:13])
 
-# Compute the peak of anteroposterior velocity during the first strike in a given species :
+# Compute the peak of anteroposterior velocity during the first strike in each 
+# species :
 
 ## carps
 Vx_FS_min_Carps_mean_W <- mean(Vx_FS_min_W[1:7])
@@ -898,7 +937,8 @@ Vx_FS_min_Tilapias_sd_W<- sd(Vx_FS_min_W[8:13])
 Vx_FS_min_Tilapias_mean_F <- mean(Vx_FS_min_F[8:13])
 Vx_FS_min_Tilapias_sd_F<- sd(Vx_FS_min_F[8:13])
 
-# Compute the peak of anteroposterior velocity during the rest of the sequence in a given species :
+# Compute the peak of anteroposterior velocity during the rest of the sequence 
+#in each species :
 
 ## carps
 Vx_FS_max_Carps_mean_W <- mean(Vx_FS_max_W[1:7])
@@ -915,7 +955,6 @@ Vx_FS_max_Tilapias_mean_F <- mean(Vx_FS_max_F[8:13])
 Vx_FS_max_Tilapias_sd_F<- sd(Vx_FS_max_F[8:13])
 
 ```
-
 
 The absolute anteroposterior velocity of the water tracers increased from 
 `r round(abs(Vx_FS_init_Carps_mean_W), digits = 2) ` $\pm$ 
@@ -939,7 +978,7 @@ in tilapias).
 After the first strike, a phase of apparent stasis occurred, with a steady, low-velocity, anteroposterior trajectory of the water tracers, leading to a nearly complete stop of the food. 
 
 
-#### Reverse flow 
+### Reverse flow 
 
 We use the maximum of the **average_VX** data to obtain the maximum amplitude
 the water tracers motion during the reverse flow because the X axis is pointing
@@ -971,15 +1010,21 @@ Vx_RF_Tilapias <- abs(Vx_RF[8:13])
 - For the carps, the maximum velocity amplitude is
 `r round(mean(Vx_RF_Carps), digits = 2) ` $\pm$   
 `r round(x=sd(Vx_RF_Carps), digits=2) ` $cm/s$  
+
 - For the tilapias, the maximum velocity amplitude is 
 `r round(mean(Vx_RF_Tilapias), digits = 2) ` $\pm$ 
 `r round(x=sd(Vx_RF_Tilapias), digits=2) ` $cm/s$
   
-
+  
 ## Relative proportion of tx, ty, tz 
 
 We want to calculate the relative contribution of each component of the 
 trajectory. 
+
+### Data preparation
+
+We compute the proportion of tx, ty, and tz over each sequence and for each 
+item.
 
 ```{r Data_Proportion , echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -1018,15 +1063,12 @@ Data_Proportion <-  map(.x = Trials,
 
 ```
 
-Based on these data, we plot an histogram corresponding to the x, y, and z 
-components contribution for each phase of the suction feeding sequence among 
-the 13 analyzed trials for each item (water and food). 
 
 ### First strike
 
 We extract the first strike data, based on the "phase" variable. 
 
-```{r FirstStrike_comp, echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
+```{r FirstStrike_comp}
 
 # reminder
 #  1: first strike
@@ -1038,19 +1080,13 @@ FirstStrike_comp <- map(.x = Trials,
   .f = ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 1), ]) %>%
   set_names(names(Data_Proportion))
 
+```
 
-Mean_FirstStrike_comp <-
-  map(.x = Trials,
-      .f = ~ FirstStrike_comp[[.]] %>%
-        summarise(
-          mean_tx_prop = mean(tx_prop, na.rm = TRUE),
-          mean_ty_prop = mean(ty_prop, na.rm = TRUE),
-          mean_tz_prop = mean(tz_prop, na.rm = TRUE),
-          sd_tx_prop =  sd(tx_prop, na.rm = TRUE),
-          sd_ty_prop =  sd(ty_prop, na.rm = TRUE),
-          sd_tz_prop =  sd(tz_prop, na.rm = TRUE))) %>%
-  set_names(names(FirstStrike_comp))
+We calculate the mean and standard deviation of each component proportion for
+the food tracers. 
 
+```{r}
+# Food 
 
 Mean_FirstStrike_comp_F <-
   map(.x = Trials,
@@ -1063,43 +1099,6 @@ Mean_FirstStrike_comp_F <-
           sd_ty_prop =  sd(ty_prop_food, na.rm = TRUE),
           sd_tz_prop =  sd(tz_prop_food, na.rm = TRUE))) %>%
   set_names(names(FirstStrike_comp))
-
-
-Mean_FirstStrike_comp__ <- data.frame(
-  mean = c(
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$mean_tx_prop
-    ),
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$mean_ty_prop
-    ),
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$mean_tz_prop
-    )
-  ),
-  sd = c(
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$sd_tx_prop
-    ),
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$sd_ty_prop
-    ),
-    map_dbl(
-      .x = Trials,
-      .f = ~ Mean_FirstStrike_comp[[.]]$sd_tz_prop
-    )
-  ),
-  species = c(rep("carps", 7), rep("tilapias", 6)),
-  trials = names(Mean_FirstStrike_comp),
-  component = c(rep("tx", length(Trials)),
-                rep("ty", length(Trials)),
-                rep("tz", length(Trials)))
-)
 
 Mean_FirstStrike_comp__F <- data.frame(
   mean = c(
@@ -1137,7 +1136,83 @@ Mean_FirstStrike_comp__F <- data.frame(
                 rep("tz", length(Trials)))
 )
 
+```
+
+We calculate the mean and standard deviation of each component proportion for
+the water tracers. 
+
+```{r}
+# Water
+
+Mean_FirstStrike_comp <-
+  map(.x = Trials,
+      .f = ~ FirstStrike_comp[[.]] %>%
+        summarise(
+          mean_tx_prop = mean(tx_prop, na.rm = TRUE),
+          mean_ty_prop = mean(ty_prop, na.rm = TRUE),
+          mean_tz_prop = mean(tz_prop, na.rm = TRUE),
+          sd_tx_prop =  sd(tx_prop, na.rm = TRUE),
+          sd_ty_prop =  sd(ty_prop, na.rm = TRUE),
+          sd_tz_prop =  sd(tz_prop, na.rm = TRUE))) %>%
+  set_names(names(FirstStrike_comp))
+
+Mean_FirstStrike_comp__ <- data.frame(
+  mean = c(
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$mean_tx_prop
+    ),
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$mean_ty_prop
+    ),
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$mean_tz_prop
+    )
+  ),
+  sd = c(
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$sd_tx_prop
+    ),
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$sd_ty_prop
+    ),
+    map_dbl(
+      .x = Trials,
+      .f = ~ Mean_FirstStrike_comp[[.]]$sd_tz_prop
+    )
+  ),
+  species = c(rep("carps", 7), rep("tilapias", 6)),
+  trials = names(Mean_FirstStrike_comp),
+  component = c(rep("tx", length(Trials)),
+                rep("ty", length(Trials)),
+                rep("tz", length(Trials)))
+)
+```
+
+Based on these data, we plot an histogram corresponding to the x, y, and z 
+components contribution for the first strike among the 13 analyzed trials 
+for each item (water and food). 
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 # plot the First strike data for each trial
+ggplot(data = Mean_FirstStrike_comp__F, 
+       aes(x = trials, 
+           y = mean, 
+           fill =component)) +
+  geom_bar(stat = "identity", 
+           position = position_dodge()) +
+  geom_errorbar(aes(ymin = mean - sd, 
+                    ymax = mean + sd),
+                width = .2,
+                position = position_dodge(0.9)) +
+  theme_minimal() +
+  # theme(legend.position = "none") +
+  guides(x =  guide_axis(angle = 45)) +
+  labs(subtitle = "First strike food tracers")
 
 ggplot(data = Mean_FirstStrike_comp__, 
        aes(x = trials, 
@@ -1152,28 +1227,10 @@ ggplot(data = Mean_FirstStrike_comp__,
   theme_minimal() +
   # theme(legend.position = "none") +
   guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "First strike")
-
-
-ggplot(data = Mean_FirstStrike_comp__F, 
-       aes(x = trials, 
-           y = mean, 
-           fill =component)) +
-  geom_bar(stat = "identity", 
-           position = position_dodge()) +
-  geom_errorbar(aes(ymin = mean - sd, 
-                    ymax = mean + sd),
-                width = .2,
-                position = position_dodge(0.9)) +
-  theme_minimal() +
-  # theme(legend.position = "none") +
-  guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "First strike")
-
+  labs(subtitle = "First strike water tracers")
 
 
 ```
-
 
 
 ### Reverse flow
@@ -1181,8 +1238,7 @@ ggplot(data = Mean_FirstStrike_comp__F,
 We extract the reverse flow data, based on the "phase" variable and plot the 
 relative contribution of each variable during the reverse flow phase
 
-```{r RF_component , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
-
+```{r RF_component}
 
 # reminder
 #  1: first strike
@@ -1195,6 +1251,12 @@ RF_comp <-
       ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == -1), ])  %>%
   set_names(names(Data_Proportion))
 
+```
+
+We calculate the mean and standard deviation of each component proportion for
+the food tracers. 
+
+```{r}
 # food
 
 Mean_RF_comp_F <- map(
@@ -1229,8 +1291,12 @@ Mean_RF_comp__F <- data.frame(
                 rep("ty", length(Trials)),
                 rep("tz", length(Trials)))
 )
+```
 
+We calculate the mean and standard deviation of each component proportion for
+the water tracers. 
 
+```{r}
 
 # water
 Mean_RF_comp <- map(
@@ -1265,7 +1331,14 @@ Mean_RF_comp__ <- data.frame(
                 rep("ty", length(Trials)),
                 rep("tz", length(Trials)))
 )
+```
 
+
+Based on these data, we plot an histogram corresponding to the x, y, and z 
+components contribution for the reverse flow among the 13 analyzed trials 
+for each item (water and food). 
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 # plot the RF data for each trial
 # food
 ggplot(data = Mean_RF_comp__F, aes(x = trials, y = mean, fill = component)) +
@@ -1276,7 +1349,7 @@ ggplot(data = Mean_RF_comp__F, aes(x = trials, y = mean, fill = component)) +
   theme_minimal() +
   # theme(legend.position = "none") +
   guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "Reverse flow")
+  labs(subtitle = "Reverse flow food tracers")
 
 
 # water
@@ -1288,17 +1361,19 @@ ggplot(data = Mean_RF_comp__, aes(x = trials, y = mean, fill = component)) +
   theme_minimal() +
   # theme(legend.position = "none") +
   guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "Reverse flow")
-
+  labs(subtitle = "Reverse flow water tracers")
 
 ```
+
+
+
 
 ### Back Flow
 
 We extract the back flow data, based on the "phase" variable and plot the 
 relative contribution of each variable during the back flow phase.
 
-```{r BF_component , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
+```{r BF_component}
 
 # reminder
 #  1: first strike
@@ -1310,7 +1385,12 @@ BF_comp <-
   map(.x = Trials,
       ~ Data_Proportion[[.]][which(Data_Proportion[[.]]$phase == 2), ])  %>%
   set_names(names(Data_Proportion))
+```
 
+We calculate the mean and standard deviation of each component proportion for
+the food tracers.
+
+```{r}
 
 # food
 Mean_BF_comp_F <- map(
@@ -1345,7 +1425,12 @@ Mean_BF_comp__F <- data.frame(
                 rep("ty", length(Trials)),
                 rep("tz", length(Trials)))
 )
+```
 
+We calculate the mean and standard deviation of each component proportion for
+the water tracers.
+
+```{r}
 # water
 Mean_BF_comp <- map(
   .x = Trials,
@@ -1380,7 +1465,13 @@ Mean_BF_comp__ <- data.frame(
                 rep("tz", length(Trials)))
 )
 
+```
 
+Based on these data, we plot an histogram corresponding to the x, y, and z 
+components contribution for the back flow among the 13 analyzed trials 
+for each item (water and food). 
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 # plot the Back flow data for each trial
 # food
 ggplot(data = Mean_BF_comp__F, aes(x = trials, y = mean, fill = component)) +
@@ -1391,7 +1482,7 @@ ggplot(data = Mean_BF_comp__F, aes(x = trials, y = mean, fill = component)) +
   theme_minimal() +
   # theme(legend.position = "none") +
   guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "Back flow")
+  labs(subtitle = "Back flow food tracers")
 
 
 
@@ -1404,21 +1495,23 @@ ggplot(data = Mean_BF_comp__, aes(x = trials, y = mean, fill = component)) +
   theme_minimal() +
   # theme(legend.position = "none") +
   guides(x =  guide_axis(angle = 45)) +
-  labs(subtitle = "Back flow")
-
+  labs(subtitle = "Back flow water tracers")
 
 ```
-  
+
+
 
 ## Mean Relative proportion of each component during each phase
 
 We average the previous data on all the trials of a given species.
-The data correspond to Table 2 in the manuscript.
+The data correspond to Table S1 in the manuscript.
 
 ### First strike
 
-```{r FirstStrike_comp_mean , echo=TRUE, message=FALSE, warning=FALSE}
+#### Food tracer
 
+
+```{r FirstStrike_comp_mean , echo=TRUE, message=FALSE, warning=FALSE}
 
 comp <- c("tx", "ty", "tz")
 color_components <-
@@ -1452,6 +1545,7 @@ mean = c(map_dbl(
     species = c(rep("carps", 3), rep("tilapias", 3)),
     component = rep(c("tx", "ty", "tz"), 2))
 
+# Visualisation of the data
 
 hist_FS_F <-
   ggplot(data = Mean_FirstStrike_comp_F, 
@@ -1473,6 +1567,13 @@ hist_FS_F <-
   scale_color_manual(values = color_components) +
   scale_fill_manual(values =  color_components) +
     labs(title = "" , subtitle = "a. First strike Food tracer")
+
+
+```
+
+#### Water tracers
+
+```{r}
 
 # water
 Mean_first_strike_Comp <-
@@ -1501,6 +1602,7 @@ mean = c(map_dbl(
     species = c(rep("carps", 3), rep("tilapias", 3)),
     component = rep(c("tx", "ty", "tz"), 2))
 
+# Visualisation of the data
 hist_FS <-
   ggplot(data = Mean_first_strike_Comp, 
          aes(x = component, 
@@ -1522,12 +1624,13 @@ hist_FS <-
   scale_fill_manual(values =  color_components) +
   labs(title = "" , subtitle = "b. First strike Water tracers")
 
-
-
-
 ```
 
+
+
 ### Reverse Flow
+
+#### Food tracer
 
 ```{r RF_comp_mean , echo=TRUE, message=FALSE, warning=FALSE}
 # Food
@@ -1562,6 +1665,7 @@ Mean_RF_comp_F <-  data.frame(
 )
 
 
+# Visualisation of the data
 hist_RF_F <-
   ggplot(data = Mean_RF_comp_F, aes(x = component, 
                                   y = mean * 100,
@@ -1581,8 +1685,9 @@ hist_RF_F <-
   scale_fill_manual(values =  color_components) +
   labs(subtitle = "c. Reverse Flow Food tracers")
 
+```
 
-
+```{r}
 # Water
 Mean_RF_Comp <-  data.frame(
   mean = c(map_dbl(
@@ -1613,6 +1718,7 @@ Mean_RF_Comp <-  data.frame(
   component = rep(c("tx", "ty", "tz"), 2)
 )
 
+# Visualisation of the data
 
 hist_RF <-
   ggplot(data = Mean_RF_Comp, aes(x = component, 
@@ -1637,6 +1743,8 @@ hist_RF <-
 
 
 ### Back flow
+
+#### Food
 
 ```{r BF_comp_mean , echo=TRUE, message=FALSE, warning=FALSE, fig.width=5, fig.show='hold',fig.align='center'}
 
@@ -1669,7 +1777,7 @@ Mean_BF_Comp_F <-
     component = rep(c("tx", "ty", "tz"), 2)
   )
 
-
+# Visualisation of the data
 hist_BF_F <-
   ggplot(data = Mean_BF_Comp_F, 
          aes(x = component, y = mean * 100, fill = component)) +
@@ -1688,9 +1796,9 @@ hist_BF_F <-
   scale_color_manual(values = color_components) +
   scale_fill_manual(values =  color_components) +
   labs(subtitle = "e. Back Flow Food tracers")
+```
 
-
-
+```{r , echo=TRUE, message=FALSE, warning=FALSE, fig.width=7, fig.show='hold',fig.align='center'}
 # Water
 Mean_BF_Comp <-
   data.frame(
@@ -1720,7 +1828,7 @@ Mean_BF_Comp <-
     component = rep(c("tx", "ty", "tz"), 2)
   )
 
-
+# Visualisation of the data
 hist_BF <-
   ggplot(data = Mean_BF_Comp, 
          aes(x = component, y = mean * 100, fill = component)) +
@@ -1754,7 +1862,6 @@ The vertical component is more important for the tilapias compared with
 the carps, especially during the reverse and back flows.    
 
 
-
 ## Divergence 
 
 We hypothesize that the waterflow, exiting through the opercula during each 
@@ -1766,11 +1873,8 @@ cavity and increase the probability to be sensed with appropriate sensory organs
 and trapped (actively) by the pharyngeal jaws if they correspond to a food item. 
 
 We explored this hypothesis by detecting the shift in the waterflow trajectory 
-in comparison to the food tracer trajectory.  
-  - Calculating the angle formed by the position of a given particle during 
-  three consecutive frame  
-  - Calculating the curvature formed by the position of a given particle during
-  three consecutive frame  
+in comparison to the food tracer trajectory by calculating the curvature formed 
+by the position of a given particle during three consecutive frame.  
 
 
 ### Data preparation
@@ -1809,7 +1913,6 @@ str_detect(Trajectory_df$Particles, "A") ~ "F"))
 # create a vector with the name of each specimen
 Specimens <- levels(factor(substr(names(Maya_WF), start = 1, stop = 2)))
 
-
 # list all the trials associated with one specimen 
 Trial_Specimens <- map(.x = Specimens,
                        .f =~levels(factor(Trajectory_df$Trials))[
@@ -1833,7 +1936,7 @@ FS_Trial <- map(.x = Trials,
            
 ```
 
-### Trajectory cleaning
+#### Trajectory cleaning
 
 We want to filter and clean the data to only have the First Strike and 
 clean the trajectory of the particles that circle back towards the entrance of 
@@ -1848,6 +1951,8 @@ We also add a calculation of the percentage of the anteroposterior position
 
 FS_Trial_clean_beginning <- map(.x = Trials, 
                                 .f = ~delete_beginning(FS_Trial[[.]], .) )
+
+
 
 # cutting the particles that circle back towards the entrance of the mouth
 
@@ -1875,8 +1980,14 @@ We calculate the curvature made by the trajectory of each particle in the
 medio-lateral angle.
 
 
-### Divergence calculation
+### Calculation
+
 #### Mediolateral motions
+
+We calculate the angle and curvature created by a given particle over 3 
+consecutive frames in the dorsoventral plane, to obtain the divergence caused by
+the mediolateral motions. We use compute_divergence function to calculate the
+angle and the curvature.
 
 ```{r}
 Divergence <- list()
@@ -1939,9 +2050,6 @@ Divergence_clean <- Divergence
 
 Divergence_clean[["T2P1T10"]] <- NULL # we delete "T2P1T10" trial because the 
 # food is not swallowed by the fish
-
-
-
 
 ```
 
@@ -2013,9 +2121,13 @@ Divergence_df <- Divergence_df %>%
 ```
 
 
-##### Average of food and water tracer angle on a small span of tx
+##### Average of food and water tracers angle on a small span of tx
 
-###### Data preparation
+To compare the curvature of each tracer at different levels of the buccal 
+cavity, we average the food and water tracers curvature on a small span of tx.
+
+
+###### Data preparation in Carps
 
 ```{r}
 
@@ -2070,9 +2182,9 @@ Curvature_interval_food_carps <- Divergence_df_food_carps %>%
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                            str_detect(string = particle, pattern = "A") ~ "F"))
  
-
-
 ```
+
+###### Data preparation in Tilapias
 
 ```{r}
  # Tilapias 
@@ -2120,14 +2232,11 @@ Curvature_interval_food_tilapias <- Divergence_df_food_tilapias %>%
 ```
 
 
-
-###### Visualisation
+##### Visualisation
 Now that we have the angle for intervals of tx for the water and the food items, 
 we organize the data by Species and visualize the difference between each item 
-(Figure 4 in the manuscript).
+(Figure 4 in the manuscript), in both species.
 
-
-##### Curvature
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
   #Carp data:
@@ -2156,7 +2265,7 @@ we organize the data by Species and visualize the difference between each item
 ```
 
 
-```{r}
+```{r, fig.width=5, fig.show='hold',fig.align='center'}
   # Tilapia data:
   color <- c(palette_IOFLOW[13], # grey
              palette_IOFLOW[5]   # blue
@@ -2185,88 +2294,48 @@ we organize the data by Species and visualize the difference between each item
 
 ##### Statistical test
 
-##### t-test
-We perform a t.test on each interval.
+We perform a kruskal test on each interval as the distribution of the data 
+was not normal.
+
 
 ```{r}
 # Carps
 Intervals <- levels(Curvature_interval_carps$interval)
 
-t_test_results_Carps <- map(.x = Intervals, 
-                            .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_carps, interval== .), 
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% 
-  set_names(Intervals)
-
-t_test_p_value_Carps <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], 
-                                             group_name = "p.value")) %>%
-  set_names(Intervals)
-
-
-# Tilapias 
-Intervals <- levels(Curvature_interval_tilapias$interval)
-t_test_results_Tilapias <- map(.x = Intervals, 
-                            .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_tilapias, interval== .),
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% 
-  set_names(Intervals)
-
-
-t_test_p_value_Tilapias <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]],
-                                             group_name = "p.value")) %>%
-  set_names(Intervals)
-
-```
-
-
-
-##### kruskal.test
-We perform an anova on each interval.
-
-```{r}
-# Carps
-Intervals <- levels(Curvature_interval_carps$interval)
-
-t_test_results_Carps <- map(.x = Intervals, 
+kruskal.test_results_Carps_ML <- map(.x = Intervals, 
                             .f = ~(kruskal.test(curvature ~ item,
                                           data = filter(.data = Curvature_interval_carps, interval== .)))) %>% 
   set_names(Intervals)
 
-kruskal.test_p_value_Carps <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], 
+kruskal.test_p_value_Carps_ML <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = kruskal.test_results_Carps_ML[[.]], 
                                              group_name = "p.value")) %>%
   set_names(Intervals)
 
+print(kruskal.test_p_value_Carps_ML)
 
 # Tilapias 
 Intervals <- levels(Curvature_interval_tilapias$interval)
-t_test_results_Tilapias <- map(.x = Intervals, 
+kruskal.test_results_Tilapias_ML <- map(.x = Intervals, 
                             .f = ~(kruskal.test(curvature ~ item,
                                           data = filter(.data = Curvature_interval_tilapias, interval== .)))) %>% 
   set_names(Intervals)
 
 
-kruskal.test_p_value_Tilapias <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]],
+kruskal.test_p_value_Tilapias_ML <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = kruskal.test_results_Tilapias_ML[[.]],
                                              group_name = "p.value")) %>%
   set_names(Intervals)
-
+print(kruskal.test_p_value_Tilapias_ML)
 
 ```
 
 
 
 #### Dorsoventral motions
+
+We repeat the same analysis on the Dorsoventral motions (not shown in the 
+manuscript). 
 
 
 ```{r}
@@ -2381,9 +2450,9 @@ Divergence_df <- Divergence_df %>%
 ```
 
 
-##### Average of food and water tracer angle on a small span of tx
+#### Average of food and water tracer angle on a small span of tx
 
-###### Data preparation
+##### Data preparation in Carps
 
 ```{r}
 
@@ -2434,8 +2503,13 @@ Curvature_interval_food_carps <- Divergence_df_food_carps %>%
    arrange(desc(interval)) %>% 
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                            str_detect(string = particle, pattern = "A") ~ "F"))
- 
- 
+
+```
+
+##### Data preparation in Tilapias
+
+```{r}
+
  
  # tilapias 
  
@@ -2479,16 +2553,13 @@ Curvature_interval_food_tilapias <- Divergence_df_food_tilapias %>%
  mutate(item = case_when(str_detect(string = particle, pattern = "F") ~ "W", 
                            str_detect(string = particle, pattern = "A") ~ "F"))
 
-
 ```
 
-###### Visualisation
+
+#### Visualisation
 Now that we have the angle for intervals of tx for the water and the food items,
-we organize the data by Species and visualize the difference between each item 
-(Figure 4 in the manuscript).
+we organize the data by Species and visualize the difference between each item.
 
-
-##### Curvature
 
 ```{r , fig.width=5, fig.show='hold',fig.align='center'}
  #Carp data:
@@ -2509,11 +2580,13 @@ we organize the data by Species and visualize the difference between each item
     theme_minimal() +
     stat_summary(fun=mean, geom="point", size=1, col = "white",
                  position = position_dodge(0.75)) +
-    theme(legend.position = "none") + 
-    ylim(-0.5,2) 
+    theme(legend.position = "none") + ylim(-0.5,2) 
+   
+```
+   
 
-    
-  # Tilapia data:
+```{r, fig.width=5, fig.show='hold',fig.align='center'}
+ # Tilapia data:
   color <- c(palette_IOFLOW[13], # grey
              palette_IOFLOW[5]   # blue
   )
@@ -2535,52 +2608,42 @@ we organize the data by Species and visualize the difference between each item
     theme(legend.position = "none") + 
     ylim(-0.5,2) 
 
-  
-  
-
 ```
+    
 
 
-##### Statistical test
+#### Statistical test
 
-We perform a t.test on each interval.
+We perform a kruskal test on each interval.
 
 ```{r}
 # Carps
 Intervals <- levels(Curvature_interval_carps$interval)
-t_test_results_Carps <- map(.x = Intervals, 
-                            .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_carps, interval== .), 
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% 
+
+kruskal.test_results_Carps_DV <- map(.x = Intervals, 
+                            .f = ~(kruskal.test(curvature ~ item,
+                                          data = filter(.data = Curvature_interval_carps, interval== .)))) %>% 
   set_names(Intervals)
 
-t_test_p_value_Carps_dv <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Carps[[.]], 
+kruskal.test_p_value_Carps_DV <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = kruskal.test_results_Carps_DV[[.]], 
                                              group_name = "p.value")) %>%
   set_names(Intervals)
 
-
+print(kruskal.test_p_value_Carps_DV)
 # Tilapias 
 Intervals <- levels(Curvature_interval_tilapias$interval)
-t_test_results_Tilapias <- map(.x = Intervals, 
-                            .f = ~(t.test(curvature ~ item,
-                                          data = filter(.data = Curvature_interval_tilapias, interval== .),
-                                          alternative = "two.sided",
-                                          mu = 0,
-                                          paired = FALSE,
-                                          var.equal = TRUE,
-                                          conf.level = 0.95))) %>% 
+kruskal.test_results_Tilapias_DV <- map(.x = Intervals, 
+                            .f = ~(kruskal.test(curvature ~ item,
+                                          data = filter(.data = Curvature_interval_tilapias, interval== .)))) %>% 
   set_names(Intervals)
 
 
-t_test_p_value_Tilapias_dv <-map(.x = Intervals, 
-                           .f = ~get_sublist(lst = t_test_results_Tilapias[[.]],
-                                             group_name = "p.value")) %>%
+kruskal.test_p_value_Tilapias_DV <-map(.x = Intervals, 
+                           .f = ~get_sublist(lst = kruskal.test_results_Tilapias_DV[[.]], group_name = "p.value")) %>%
   set_names(Intervals)
+
+print(kruskal.test_p_value_Tilapias_DV)
 
 ```
 
@@ -2594,8 +2657,9 @@ We want to visualise on the same plot
 - Hyoid dorsoventral : tip of hyoid relative to pharyngeal jaw (ty)
 - Ope opening/closing : tip of ope relative to pharyngeal jaw (tz)
 
+## Data preparation  
 
-## Building Kdata
+### Building Kdata
 
 We want to combine KData (the kinematics data) and MayaData (the tracer 
 trajectory data) and add Time, Frame, Phase.
@@ -2635,12 +2699,15 @@ KData <- mapply(FUN = c, Time, Food, Water, Maya_Loc, SIMPLIFY=FALSE)
 
 ```
 
+
+### Gape calculation
+
 We calculate the Gape, using the locators placed on the tip of the lower and 
 upper jaws.
 
 ```{r}
 
-# Gape calculation
+
 
 Jaws <- map(.x = Trials[1:10],
             .f = ~ (select(
@@ -2669,17 +2736,16 @@ KData <- mapply(FUN = c, KData,  Gape, SIMPLIFY=FALSE)
 ```
 
 
+## Visualisation
 
-#### Plots kinematics
-
-##### Carps
+### Carps
 
 We plot the suction feeding sequence of trial C2P1T04 of carp to visualize 
 the kinematics of Gape, Hyoid depression and Opercula opening relative to the
 water motions.
 
 
-```{r}
+```{r, fig.width=5, fig.show='hold',fig.align='center'}
 
 # Carps
 
@@ -2687,8 +2753,6 @@ trial <- "C2P1T04"
 subtime <- 1:1592
 xlim_inf <- min(subtime)
 xlim_sup <- max(subtime)
-
-
 
 
 # Plot 
@@ -2700,18 +2764,21 @@ color <- c(palette_IOFLOW[13], # grey
 # Tx plot
 ylab <- "x-position (cm)"
 d <- cbind(rbind(Mean_tx_W[[trial]][subtime,],Mean_tx_F[[trial]][subtime,]), 
-           time = Timing[[trial]]$time[subtime])
+           timing = Timing[[trial]]$timing[subtime])
 
-plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, subtitle = subtitle, 
+plot.Tx_C2P1T04 <- plot_mean(d, ylab=ylab, xlab=xlab, 
                              color = color) + theme(plot.margin = unit(c(0,0,0,0), "lines")) + theme_minimal()+
   theme(legend.position = "none", panel.grid.minor = element_blank()) 
 
 
-
 # Bone kinematics
 
-color <- c("#161717", "#616363", "#9ca19e")
-size <- 0.5
+#c4f2ef: blue (gape)
+#e9bc70: orange (hyoid)
+#eeceee: pink (opercula)
+
+color <- c("#c4f2ef", "#e9bc70", "#eeceee")
+size <- 1
 
 KData_df <- as.data.frame(KData[[trial]])
 KData_df <- KData_df[subtime,]
@@ -2738,19 +2805,16 @@ KData_plots <-  ggplot(KData_df, aes(x = Time, y = Gape-min(Gape),
 ggarrange(plot.Tx_C2P1T04+ rremove("x.text") + rremove(object = "xlab") , KData_plots, 
          ncol = 1, nrow = 2, align = "v")
 
-
-
-
 ```
 
-##### Tilapias
+### Tilapias
 
 We plot the suction feeding sequence of trial T1P1T06 of tilapia to visualize 
 the kinematics of Gape, Hyoid depression and Opercula abduction relative to the 
 water motions.
 
 
-```{r}
+```{r, fig.width=5, fig.show='hold',fig.align='center'}
 # Tilapias
 
 trial <- "T1P1T06"
@@ -2758,9 +2822,7 @@ subtime <- 100:1280
 subtitle <- " "
 xlim_inf <- min(subtime)
 xlim_sup <- max(subtime)
-d <- cbind(Mean_tx_W[[trial]][subtime,], time = Timing[[trial]]$time[subtime])
-
-
+d <- cbind(Mean_tx_W[[trial]][subtime,], timing = Timing[[trial]]$timing[subtime])
 
 # Plot 
 ## Water
@@ -2771,18 +2833,21 @@ color <- c(palette_IOFLOW[13], # grey
 # Tx plot
 ylab <- "x-position (cm)"
 d <- cbind(rbind(Mean_tx_W[[trial]][subtime,],Mean_tx_F[[trial]][subtime,]), 
-           time = Timing[[trial]]$time[subtime])
+           timing = Timing[[trial]]$timing[subtime])
 
-plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, subtitle = subtitle, 
+plot.Tx_T1P1T06 <- plot_mean(d, ylab=ylab, xlab=xlab, 
                              color = color)  + theme(plot.margin = unit(c(0,0,0,0), "lines")) + theme_minimal()+
   theme(legend.position = "none", panel.grid.minor = element_blank()) 
 
 
-
 # Bone kinematics
 
-color <- c("#161717", "#616363", "#9ca19e")
-size <- 0.5
+#c4f2ef: blue (gape)
+#e9bc70: orange (hyoid)
+#eeceee: pink (opercula)
+
+color <- c("#c4f2ef", "#e9bc70", "#eeceee")
+size <- 1
 
 
 KData_df <- as.data.frame(KData[[trial]])
@@ -2811,5 +2876,5 @@ ggarrange(plot.Tx_T1P1T06+ rremove("x.text") + rremove(object = "xlab") , KData_
 
 ```
 
-
+These graphs correspond to Figure 5 in the manuscript.
 

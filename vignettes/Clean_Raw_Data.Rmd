@@ -5,7 +5,7 @@ output: rmarkdown::html_vignette
 description: >
   Start here to understand how the IOFLOW raw data are processed to feed the IOFLOW analysis
 vignette: >
-  %\VignetteIndexEntry{IOFLOW}
+  %\VignetteIndexEntry{Clean Raw Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,7 +24,6 @@ knitr::opts_chunk$set(
 
 ## Libraries
 ```{r library, echo=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
-
 library(kableExtra)
 devtools::load_all()
 
@@ -150,7 +149,7 @@ The imported raw data are processed in the IOFLOWdata package. Here, we give an 
 A color palette is associated with the IOFLOWdata package
 
 ```{r, echo=FALSE, message=FALSE, warnings=FALSE}
-plot(x=1:12, col=palette_IOFLOW, pch=21, bg=palette_IOFLOW, main = "IOFLOWdata palette", xlab = "color number", ylab="")
+plot(x=1:12, col=palette_IOFLOW, pch=21, bg=palette_IOFLOW, main = "IOFLOWdata palette")
 
 ```
 

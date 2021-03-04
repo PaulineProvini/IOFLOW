@@ -12,6 +12,7 @@ NULL
 #' The color palette used to plot the figure of the IOFLOW analysis
 #'#' @format A \code{vector} of length 13 with colors hex code
 "palette_IOFLOW"
+NULL
 
 #' Density_Data
 #'
@@ -24,6 +25,7 @@ NULL
 #'   \item{Y}{the y trajectory of the water tracer}
 #' }
 "Density_Data"
+NULL
 
 #' Maya_WF
 #'
@@ -40,6 +42,7 @@ NULL
 #'   \item{F01.data.tz}{the z trajectory of the water tracer "F01"}
 #' }
 "Maya_WF"
+NULL
 
 #' Maya_RB
 #'
@@ -60,7 +63,7 @@ NULL
 #'   ...
 #' }
 "Maya_RB"
-
+NULL
 
 #' Maya_Loc
 #'
@@ -84,7 +87,7 @@ NULL
 #'   ...
 #' }
 "Maya_Loc"
-
+NULL
 
 #' Timing
 #'
@@ -92,10 +95,11 @@ NULL
 #' @format A \code{list} of 13 lists corresponding to timing information:
 #' \describe{
 #'   \item{frame}{frames of the trial}
-#'   \item{time}{time of the trial (750 fps)}
+#'   \item{timing}{time of the trial (750 fps)}
 #'   \item{seq}{color code corresponding to phase (1st strike or reverse flow)}
 #' }
 "Timing"
+NULL
 
 #' Sequence
 #'
@@ -109,11 +113,13 @@ NULL
 #'   \item{end_EF}{end of the first reverse flow}
 #' }
 "Sequence"
+NULL
 
 #' Trials
 #' A sequence number of the length of the analysed trials
 #'#' @format A \code{vector} of length 13
 "Trials"
+NULL
 
 #' WF_tx
 #'
@@ -124,6 +130,7 @@ NULL
 #'   \item{A01.data.tx}{the x trajectory of the food tracer "A01"}
 #' }
 "WF_tx"
+NULL
 
 #' WF_ty
 #'
@@ -134,6 +141,7 @@ NULL
 #'   \item{A01.data.ty}{the y trajectory of the food tracer "A01"}
 #' }
 "WF_ty"
+NULL
 
 #' WF_tz
 #'
@@ -144,6 +152,7 @@ NULL
 #'   \item{A01.data.tz}{the z trajectory of the food tracer "A01"}
 #' }
 "WF_tz"
+NULL
 
 #' WF_vx
 #'
@@ -154,6 +163,7 @@ NULL
 #'   \item{A01.data.vx}{the x velocity of the food tracer "A01"}
 #' }
 "WF_vx"
+NULL
 
 #' WF_vy
 #'
@@ -164,6 +174,7 @@ NULL
 #'   \item{A01.data.vy}{the y velocity of the food tracer "A01"}
 #' }
 "WF_vy"
+NULL
 
 #' WF_vz
 #'
@@ -174,7 +185,7 @@ NULL
 #'   \item{A01.data.vz}{the z velocity of the food tracer "A01"}
 #' }
 "WF_vz"
-
+NULL
 
 #' Mean_tx_W
 #'
@@ -188,6 +199,7 @@ NULL
 #'   \item{max}{the maximum of x trajectory over all the water tracers on each frame of the trial}
 #' }
 "Mean_tx_W"
+NULL
 
 #' Mean_ty_W
 #'
@@ -201,6 +213,7 @@ NULL
 #'   \item{max}{the maximum of y trajectory over all the water tracers on each frame of the trial}
 #' }
 "Mean_ty_W"
+NULL
 
 #' Mean_tz_W
 #'
@@ -214,7 +227,7 @@ NULL
 #'   \item{max}{the maximum of z trajectory over all the water tracers on each frame of the trial}
 #' }
 "Mean_tz_W"
-
+NULL
 
 #' Mean_tx_F
 #'
@@ -228,6 +241,7 @@ NULL
 #'   \item{max}{the maximum of x trajectory over all the food tracers on each frame of the trial}
 #' }
 "Mean_tx_F"
+NULL
 
 #' Mean_ty_F
 #'
@@ -241,6 +255,7 @@ NULL
 #'   \item{max}{the maximum of y trajectory over all the food tracers on each frame of the trial}
 #' }
 "Mean_ty_F"
+NULL
 
 #' Mean_tz_F
 #'
@@ -254,7 +269,7 @@ NULL
 #'   \item{max}{the maximum of z trajectory over all the food tracers on each frame of the trial}
 #' }
 "Mean_tz_F"
-
+NULL
 
 #' Mean_vx_W
 #'
@@ -268,6 +283,7 @@ NULL
 #'   \item{max}{the maximum of x velocity over all the water tracers on each frame of the trial}
 #' }
 "Mean_vx_W"
+NULL
 
 #' Mean_vy_W
 #'
@@ -281,6 +297,7 @@ NULL
 #'   \item{max}{the maximum of y velocity over all the water tracers on each frame of the trial}
 #' }
 "Mean_vy_W"
+NULL
 
 #' Mean_vz_W
 #'
@@ -294,7 +311,7 @@ NULL
 #'   \item{max}{the maximum of z velocity over all the water tracers on each frame of the trial}
 #' }
 "Mean_vz_W"
-
+NULL
 
 #' Mean_vx_F
 #'
@@ -308,6 +325,7 @@ NULL
 #'   \item{max}{the maximum of x velocity over all the food tracers on each frame of the trial}
 #' }
 "Mean_vx_F"
+NULL
 
 #' Mean_vy_F
 #'
@@ -321,6 +339,7 @@ NULL
 #'   \item{max}{the maximum of y velocity over all the food tracers on each frame of the trial}
 #' }
 "Mean_vy_F"
+NULL
 
 #' Mean_vz_F
 #'
@@ -334,7 +353,7 @@ NULL
 #'   \item{max}{the maximum of z velocity over all the food tracers on each frame of the trial}
 #' }
 "Mean_vz_F"
-
+NULL
 
 #' Particle
 #'
@@ -349,3 +368,4 @@ NULL
 #'   ...
 #' }
 "Particle"
+NULL

@@ -8,7 +8,7 @@
 A \code{list} of 13 lists corresponding to timing information:
 \describe{
 \item{frame}{frames of the trial}
-\item{time}{time of the trial (750 fps)}
+\item{timing}{time of the trial (750 fps)}
 \item{seq}{color code corresponding to phase (1st strike or reverse flow)}
 }
 }

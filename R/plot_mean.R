@@ -13,9 +13,9 @@
 plot_mean <- function(d, ylab="", xlab="",subtitle="", color = c("black", p1[5])) {
   p <- ggplot(data = d,
               aes(
-                x = time,
+                x = timing,
                 y =  average,
-                ymin = (average + std),
+                ymin = (average +std),
                 ymax = (average - std), group=item
               )) +
     geom_line(aes(colour = item), size= 1) +

@@ -12,15 +12,16 @@ library(purrr)
 library(stringr)
 
 ## Source functions -----------------------
-source(file = here("R", "name_nested.R"))
-source(file = here("R", "to_nested_colnames.R"))
-source(file = here("R", "sublist.R"))
-source(file = here("R", "compute_velocity.R"))
-source(file = here("R", "build_vel.R"))
-source(file = here("R", "mean_particles.R"))
-source(file = here("R", "build_particle.R"))
-source(file = here("R", "build_mean.R"))
+# source(file = here("R", "name_nested.R"))
+# source(file = here("R", "to_nested_colnames.R"))
+# source(file = here("R", "sublist.R"))
+# source(file = here("R", "compute_velocity.R"))
+# source(file = here("R", "build_vel.R"))
+# source(file = here("R", "mean_particles.R"))
+# source(file = here("R", "build_particle.R"))
+# source(file = here("R", "build_mean.R"))
 
+devtools::load_all()
 
 
 # 2. SETTINGS #############################################
@@ -119,7 +120,7 @@ Trials <-  1:length(Maya_WF)
 
 Frame <- lapply(Maya_WF, subset, select=1)
 
-Time <- map(.x = Frame, .f = ~./750) %>% name_nested(x = 1, name = "time")
+Time <- map(.x = Frame, .f = ~./750) %>% name_nested(x = 1, name = "timing")
 
 
 Seq <- lapply(Maya_WF, subset, select=1) %>%
@@ -204,3 +205,5 @@ usethis::use_data(palette_IOFLOW, Density_Data, Trials, Maya_WF, Maya_RB, Maya_L
                   Mean_tx_F, Mean_ty_F, Mean_tz_F,
                   Mean_vx_W, Mean_vy_W, Mean_vz_W,
                   Mean_vx_F, Mean_vy_F, Mean_vz_F, Particle, overwrite = T)
+
+rm(list = c("xlab", "ylab"))
