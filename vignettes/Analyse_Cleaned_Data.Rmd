@@ -2224,10 +2224,16 @@ Curvature_interval_food_carp <- Divergence_df_food_carp %>%
  # Tilapia 
  
 # split between water and food particles
-Divergence_df_water_tilapia <-  Divergence_df_tilapia %>% filter(item == "W") %>% 
-  filter(tx_pcent > 0 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
-Divergence_df_food_tilapia <-  Divergence_df_tilapia %>% filter(item == "F") %>% 
-  filter(tx_pcent > 0 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+Divergence_df_water_tilapia <-  
+  Divergence_df_tilapia %>% 
+  filter(item == "W") %>% 
+  filter(tx_pcent > 0 & tx_pcent < 75)%>% 
+  arrange(desc(tx_pcent))
+
+Divergence_df_food_tilapia <-  Divergence_df_tilapia %>% 
+  filter(item == "F") %>% 
+  filter(tx_pcent > 0 & tx_pcent < 75)%>% 
+  arrange(desc(tx_pcent)) 
 # %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
 
 # we cut by the number of intervals we want (5 intervals)
@@ -2499,10 +2505,14 @@ Divergence_df_carp <-  Divergence_df %>% filter(str_detect(string = particle, pa
 # Carp 
  
 # split between water and food particles
-Divergence_df_water_carp <-  Divergence_df_carp %>% filter(item == "W") %>% 
-  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
-Divergence_df_food_carp <-  Divergence_df_carp %>% filter(item == "F") %>% 
-  filter(tx_pcent > 1 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
+Divergence_df_water_carp <-  Divergence_df_carp %>% 
+  filter(item == "W") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>% 
+  arrange(desc(tx_pcent))
+Divergence_df_food_carp <-  Divergence_df_carp %>% 
+  filter(item == "F") %>% 
+  filter(tx_pcent > 1 & tx_pcent < 75)%>%
+  arrange(desc(tx_pcent)) 
 # %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
 
 # we cut by the number of intervals we want (5 intervals)
@@ -2548,8 +2558,10 @@ Curvature_interval_food_carp <- Divergence_df_food_carp %>%
  # tilapia 
  
 # split between water and food particles
-Divergence_df_water_tilapia <-  Divergence_df_tilapia %>% filter(item == "W") %>% 
-  filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent))
+Divergence_df_water_tilapia <-  Divergence_df_tilapia %>% 
+  filter(item == "W") %>% 
+  filter(tx_pcent > 20 & tx_pcent < 75)%>% 
+  arrange(desc(tx_pcent))
 Divergence_df_food_tilapia <-  Divergence_df_tilapia %>% filter(item == "F") %>% 
   filter(tx_pcent > 20 & tx_pcent < 75)%>% arrange(desc(tx_pcent)) 
 # %>%  filter(str_detect(string = particle, pattern = "T2P1T10", negate = TRUE))
@@ -2872,16 +2884,16 @@ plot_Tilapia1 <- ggplot(data = Tilapia1_3D,
 
 plot_Tilapia1
 
-
-
-graphs <- list(plot_Tilapia1, plot_Tilapia2, plot_Carp1, plot_Carp2)
-for (i in 1:4){
-
-  png(paste0("../1.Figures/",i, "_xz.png"), width = 300,height =  200, units = "px", bg = "transparent")
-    print(graphs[[i]])
-    dev.off()
-
-}
+# 
+# 
+# graphs <- list(plot_Tilapia1, plot_Tilapia2, plot_Carp1, plot_Carp2)
+# for (i in 1:4){
+# 
+#   png(paste0("../1.Figures/",i, "_xz.png"), width = 300,height =  200, units = "px", bg = "transparent")
+#     print(graphs[[i]])
+#     dev.off()
+# 
+# }
 
 ```
 
